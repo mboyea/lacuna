@@ -6,7 +6,7 @@ subject: server
 keywords: [ nix, docker, umami, keycloak, server, cms, svelte, sveltekit, typescript, sass, website, fly, fly.io ]
 default_: report
 ---
-## A SvelteKit template with the features of a [modern CMS](https://jamstack.org/headless-cms/), built using [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software)
+## A SvelteKit template with [modern CMS](https://jamstack.org/headless-cms/) features, built with [FOSS](https://en.wikipedia.org/wiki/Free_and_open-source_software)
 
 The goal is to *get out of the way of software engineers* and enable them to construct highly custom websites for their clients.
 
