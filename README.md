@@ -19,10 +19,11 @@ To run a script, type the `Command` in a shell with [Nix](https://nixos.org/down
 | Command | Description |
 |:--- |:--- |
 | `nix run` | `nix run .#dev` |
+| `nix run .#dev` | run the website locally |
 
 ### Features
 
-#### Architecture
+#### Dependencies
 
 - Nix Package Manager
   - PostgreSQL
@@ -34,6 +35,16 @@ To run a script, type the `Command` in a shell with [Nix](https://nixos.org/down
     - TypeScript
     - Vite
   - Podman
+
+#### Files
+
+- README.md
+- LICENSE.md
+- flake.nix
+- umami
+- keycloak
+- postgresql
+- sveltekit
 
 #### Content Editor
 
