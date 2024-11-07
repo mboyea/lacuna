@@ -23,28 +23,10 @@ To run a script, type the `Command` in a shell with [Nix](https://nixos.org/down
 
 ### Features
 
-#### Dependencies
-
-- Nix Package Manager
-  - PostgreSQL
-  - Keycloak
-  - Umami
-  - PNPM
-    - SvelteKit
-    - Sass
-    - TypeScript
-    - Vite
-  - Podman
-
-#### Files
-
-- README.md
-- LICENSE.md
-- flake.nix
-- umami
-- keycloak
-- postgresql
-- sveltekit
+Database by PostgreSQL.
+Authentication by Keycloak.
+Web Analytics by Umami.
+Web Server by SvelteKit.
 
 #### Content Editor
 
