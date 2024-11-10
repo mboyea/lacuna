@@ -1,10 +1,11 @@
 { pkgs, name, version }: pkgs.writeShellApplication {
   name = "${name}-dev-${version}";
   runtimeInputs = [
+    pkgs.nodejs
+    pkgs.pnpm
   ];
-  # TODO launch docker containers to serve source code on development servers
   text = ''
-    echo 'Hello, World!'
+    #!/bin/sh
+    pnpm run dev
   '';
 }
-

@@ -1,4 +1,4 @@
-{ pkgs, name, version } : pkgs.writeShellApplication {
+{ pkgs, name, version }: pkgs.writeShellApplication {
   name = "${name}-deploy-${version}";
   runtimeInputs = [
   ];

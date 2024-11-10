@@ -1,17 +1,16 @@
-{ stdenv, packages }: let
-  nodePackage = builtins.fromJSON (builtins.readFile "../package.json");
-in stdenv.mkDerivation rec {
-  pname = "${nodePackage.name}-server";
-  version = nodePackage.version;
+{ stdenv, pkgs, name, version } : stdenv.mkDerivation rec {
+  pname = "${name}-server";
+  inherit version;
   src = ./.;
-  buildInputs = [];
+  buildInputs = [ pnpm nodejs ];
   buildPhase = ''
-    echo "TODO build the server using SvelteKit"
+    pnpm run build
   '';
   installPhase = ''
     mkdir -p $out/bin $out/lib
 
     echo "TODO install the server built by SvelteKit"
+
     # cp -rv $src $out/lib
 
     cat > $out/bin/${pname} << EOF
