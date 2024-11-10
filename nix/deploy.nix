@@ -1,8 +1,8 @@
 { pkgs, name, version } : pkgs.writeShellApplication {
-  name = "${name}-dev-${version}";
+  name = "${name}-deploy-${version}";
   runtimeInputs = [
   ];
-  # TODO launch docker containers to serve source code on development servers
+  # TODO build dependencies, then deploy production servers to their hosting providers
   text = ''
     echo 'Hello, World!'
   '';
