@@ -1,5 +1,23 @@
 {
   "nodes": {
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1726560853,
+        "narHash": "sha256-X6rJYSESBVr3hBoH0WbKE5KvhPU5bloyZ2L4K60/fPQ=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "c1dfcf08411b08f6b8615f7d8971a2bfa81d5e8a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1730883749,
@@ -18,8 +36,9 @@
     },
     "root": {
       "inputs": {
+        "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
-        "utils": "utils"
+        "webServer": "webServer"
       }
     },
     "systems": {
@@ -37,22 +56,28 @@
         "type": "github"
       }
     },
-    "utils": {
+    "webServer": {
       "inputs": {
-        "systems": "systems"
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1726560853,
-        "narHash": "sha256-X6rJYSESBVr3hBoH0WbKE5KvhPU5bloyZ2L4K60/fPQ=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "c1dfcf08411b08f6b8615f7d8971a2bfa81d5e8a",
-        "type": "github"
+        "dir": "sveltekit",
+        "dirtyRev": "72e650d409893cab8845f89528087e180ed338ae-dirty",
+        "dirtyShortRev": "72e650d-dirty",
+        "lastModified": 1731282880,
+        "narHash": "sha256-HnKrWzXsfGuOEg5/RzC3SWEZh0IG/O2YYnShSnPBnvY=",
+        "type": "git",
+        "url": "file:.?dir=sveltekit"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
+        "dir": "sveltekit",
+        "type": "git",
+        "url": "file:.?dir=sveltekit"
       }
     }
   },
