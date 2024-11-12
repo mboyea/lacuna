@@ -6,6 +6,8 @@
   ];
   text = ''
     #!/bin/sh
-    pnpm run dev
+    # pnpm run dev
+    echo "Hello, World!"
+    echo "I'm inside sveltekit/nix/dev.nix!"
   '';
 }

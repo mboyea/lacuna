@@ -53,13 +53,13 @@
   outputs = { self, nixpkgs, flake-utils, webServer, ... }: let
     name = "lacuna";
     version = "0.0.0";
-  in flake-utils.lib.eachDefaultSystem (
+    utils = flake-utils;
+  in utils.lib.eachDefaultSystem (
     system: let
       pkgs = import nixpkgs { inherit system; };
-      utils = import flake-utils {};
     in rec {
       packages = {
-        dev = pkgs.callPackage ./scripts/dev.nix { inherit name version; };
+        dev = pkgs.callPackage ./scripts/dev.nix { inherit name version system webServer; };
         preview = pkgs.callPackage ./scripts/preview.nix { inherit name version; };
         deploy = pkgs.callPackage ./scripts/deploy.nix { inherit name version; };
         default = packages.dev;

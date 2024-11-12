@@ -8,16 +8,16 @@
     nodePackage = builtins.fromJSON (builtins.readFile "./package.json");
     name = nodePackage.name;
     version = nodePackage.version;
-  in flake-utils.lib.eachDefaultSystem (
+    utils = flake-utils;
+  in utils.lib.eachDefaultSystem (
     system: let
       pkgs = import nixpkgs { inherit system; };
-      utils = import flake-utils {};
     in rec {
       packages = {
         dev = pkgs.callPackage ./nix/dev.nix { inherit name version; };
         server = pkgs.callPackage ./nix/server.nix { inherit name version; };
-        preview = pkgs.callPackage ./nix/preview.nix { inherit name version; server = pkgs.server; };
-        image = pkgs.callPackage ./nix/image.nix { inherit name version; server = pkgs.server; };
+        preview = pkgs.callPackage ./nix/preview.nix { inherit name version; server = packages.server; };
+        serverImage = pkgs.callPackage ./nix/image.nix { inherit name version; server = packages.server; };
         default = packages.dev;
       };
       apps = {

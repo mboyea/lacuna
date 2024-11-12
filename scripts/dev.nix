@@ -1,9 +1,11 @@
-{ pkgs, name, version }: pkgs.writeShellApplication {
+{ pkgs, name, version, system, webServer }: pkgs.writeShellApplication {
   name = "${name}-dev-${version}";
-  runtimeInputs = [];
-  # TODO launch docker containers to serve source code on development servers
+  runtimeInputs = [
+    webServer
+  ];
+  # TODO launch docker containers to serve development servers and launch hot-reloading web server with vite
   text = ''
-    echo 'Hello, World!'
+    ${webServer.packages.${system}.dev}
   '';
 }
 
