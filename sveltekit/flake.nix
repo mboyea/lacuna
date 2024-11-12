@@ -1,5 +1,5 @@
 {
-  description = "A website with a custom CMS.";
+  description = "A website to show off a custom CMS.";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
@@ -14,11 +14,11 @@
       utils = import flake-utils {};
     in rec {
       packages = {
-        dev = nixpkgs.callPackage ./nix/dev.nix { inherit name version; };
-        server = nixpkgs.callPackage ./nix/server.nix { inherit name version; };
-        preview = nixpkgs.callPackage ./nix/preview.nix { inherit name version; server = pkgs.server; };
-        image = nixpkgs.callPackage ./nix/image.nix { inherit name version; server = pkgs.server; };
-        default = pkgs.dev;
+        dev = pkgs.callPackage ./nix/dev.nix { inherit name version; };
+        server = pkgs.callPackage ./nix/server.nix { inherit name version; };
+        preview = pkgs.callPackage ./nix/preview.nix { inherit name version; server = pkgs.server; };
+        image = pkgs.callPackage ./nix/image.nix { inherit name version; server = pkgs.server; };
+        default = packages.dev;
       };
       apps = {
         dev = utils.lib.mkApp { drv = packages.dev; };
@@ -35,4 +35,3 @@
     }
   );
 }
-
