@@ -18,11 +18,11 @@ To run a script, type the `Command` in a shell with [Nix](https://nixos.org/down
 
 | Command | Description |
 |:--- |:--- |
-| `nix run` | `nix run .#dev` |
-| `nix run .#dev` | start docker containers to locally serve development servers that hot-reload from source code changes where possible |
-| `nix run .#preview` | build dependencies, then start docker containers to locally serve previews for production servers |
-| `nix run .#deploy` | build dependencies, then deploy production servers to their hosting providers |
-| `nix run .#init` | stand up all hosting providers |
+| `nix run` | `nix run . dev` |
+| `nix run . dev` | start docker containers to locally serve development servers that hot-reload from source code changes where possible |
+| `nix run . preview` | build dependencies, then start docker containers to locally serve previews for production servers |
+| `nix run . deploy` | build dependencies, then deploy production servers to their hosting providers |
+| `nix run . init` | stand up all hosting providers |
 
 ### Features
 
