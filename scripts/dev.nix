@@ -5,7 +5,7 @@
   ];
   # TODO launch docker containers to serve development servers and launch hot-reloading web server with vite
   text = ''
-    ${webServer.packages.${system}.dev}
+    ${pkgs.lib.getExe webServer.packages.${system}.dev}
   '';
 }
 

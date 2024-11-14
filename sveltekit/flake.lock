@@ -20,16 +20,15 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1731386116,
-        "narHash": "sha256-lKA770aUmjPHdTaJWnP3yQ9OI1TigenUqVC3wweqZuI=",
+        "lastModified": 1731596400,
+        "narHash": "sha256-m6D3Nqtrnu74tCsBDBRoc0OpP+ZiBA9owr900vZ3tEc=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "689fed12a013f56d4c4d3f612489634267d86529",
+        "rev": "6efe194fbec6d156eedff4210476eb06bb844bc7",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixos-24.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -37,8 +36,7 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs",
-        "webServer": "webServer"
+        "nixpkgs": "nixpkgs"
       }
     },
     "systems": {
@@ -54,30 +52,6 @@
         "owner": "nix-systems",
         "repo": "default",
         "type": "github"
-      }
-    },
-    "webServer": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "dir": "sveltekit",
-        "dirtyRev": "cbe11f545a9e5ddde55ad96c946a0d62d582f429-dirty",
-        "dirtyShortRev": "cbe11f5-dirty",
-        "lastModified": 1731453028,
-        "narHash": "sha256-UrOtb2C3lbzkatzjuuVus3bEQNQos55VsGT1WX5NAEc=",
-        "type": "git",
-        "url": "file:.?dir=sveltekit"
-      },
-      "original": {
-        "dir": "sveltekit",
-        "type": "git",
-        "url": "file:.?dir=sveltekit"
       }
     }
   },

@@ -5,7 +5,7 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs = { self, nixpkgs, flake-utils, ... }: let
-    nodePackage = builtins.fromJSON (builtins.readFile "./package.json");
+    nodePackage = builtins.fromJSON (builtins.readFile ./package.json);
     name = nodePackage.name;
     version = nodePackage.version;
     utils = flake-utils;
@@ -14,10 +14,10 @@
       pkgs = import nixpkgs { inherit system; };
     in rec {
       packages = {
-        dev = pkgs.callPackage ./nix/dev.nix { inherit name version; };
-        server = pkgs.callPackage ./nix/server.nix { inherit name version; };
-        preview = pkgs.callPackage ./nix/preview.nix { inherit name version; server = packages.server; };
-        serverImage = pkgs.callPackage ./nix/image.nix { inherit name version; server = packages.server; };
+        dev = pkgs.callPackage ./scripts/dev.nix { inherit name version; };
+        server = pkgs.callPackage ./scripts/server.nix { inherit name version; };
+        preview = pkgs.callPackage ./scripts/preview.nix { inherit name version; server = packages.server; };
+        serverImage = pkgs.callPackage ./scripts/image.nix { inherit name version; server = packages.server; };
         default = packages.dev;
       };
       apps = {
