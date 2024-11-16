@@ -13,6 +13,6 @@
     webServer
   ];
   text = ''
-    ${pkgs.lib.getExe (webServer.override { inherit cliArgs; })}
+    ${pkgs.lib.getExe (webServer.override { inherit cliArgs; })} "$@"
   '';
 }

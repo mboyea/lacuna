@@ -9,6 +9,7 @@
   runtimeInputs = [
   ];
   text = ''
-    echo "cliArgs = \"${pkgs.lib.strings.concatStringsSep " " cliArgs}\""
+    set -- "$@" ${pkgs.lib.strings.concatStringsSep " " cliArgs}
+    echo "$@"
   '';
 }
