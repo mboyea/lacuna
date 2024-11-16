@@ -13,6 +13,7 @@
     webServer
   ];
   text = ''
-    ${pkgs.lib.getExe (webServer.override { inherit cliArgs; })} "$@"
+    set -- "$@" ${pkgs.lib.strings.concatStringsSep " " cliArgs}
+    ${pkgs.lib.getExe webServer} "$@"
   '';
 }
