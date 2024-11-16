@@ -37,8 +37,7 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs",
-        "webServer": "webServer"
+        "nixpkgs": "nixpkgs"
       }
     },
     "systems": {
@@ -54,30 +53,6 @@
         "owner": "nix-systems",
         "repo": "default",
         "type": "github"
-      }
-    },
-    "webServer": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "dir": "sveltekit",
-        "dirtyRev": "cbe11f545a9e5ddde55ad96c946a0d62d582f429-dirty",
-        "dirtyShortRev": "cbe11f5-dirty",
-        "lastModified": 1731453028,
-        "narHash": "sha256-UrOtb2C3lbzkatzjuuVus3bEQNQos55VsGT1WX5NAEc=",
-        "type": "git",
-        "url": "file:.?dir=sveltekit"
-      },
-      "original": {
-        "dir": "sveltekit",
-        "type": "git",
-        "url": "file:.?dir=sveltekit"
       }
     }
   },

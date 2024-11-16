@@ -1,4 +1,4 @@
-{ pkgs, lib, name, version, server }: let
+{ pkgs, name, version, server }: let
   name = "${name}-image";
   tag = version;
   baseImage = null;
@@ -9,7 +9,7 @@ in {
     fromImage = baseImage;
     contents = [ server ];
     config = {
-      Cmd = [ "${lib.getExe server}" ];
+      Cmd = [ "${pkgs.lib.getExe server}" ];
       ExposedPorts = {
         "4173/tcp" = {};
       };
