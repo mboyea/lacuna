@@ -8,7 +8,7 @@
     echo "This is the Lacuna command line interface."
     echo
     echo "Usage:"
-    echo "  nix run .#[SCRIPT] -- [ARGUMENT]..."
+    echo "  nix run .#[SCRIPT] [ARGUMENT]..."
     echo
     echo "Scripts:"
     echo "  help    Print this helpful information"
@@ -16,7 +16,7 @@
     echo "  init    Initialize the app for deployment"
     echo "  deploy  Deploy the app"
     echo
-    echo "Use \"nix run .#[SCRIPT] -- help\" for more information about a script."
-    echo "Use \"nix run\" as an alias for \"nix run .#start -- dev\"."
+    echo "Use \"nix run .#[SCRIPT] help\" for more information about a script."
+    echo "Use \"nix run\" as an alias for \"nix run .#start dev\"."
   '';
 }

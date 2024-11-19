@@ -20,37 +20,22 @@ Because Nix manages all dependencies, it is the only tool required to be install
 
 | Command | Description |
 |:--- |:--- |
-| `nix run` | alias for `nix run .#start -- dev` |
+| `nix run` | alias for `nix run .#start dev` |
 | `nix run .#help` | print this helpful information |
 | `nix run .#start` | start the app locally |
 | `nix run .#deploy` | deploy the app |
 | `nix run .#init` | initialize the app for deployment |
 
-Use `nix run .#[SCRIPT] -- help` for more information about a script.
-Use `nix run` as an alias for `nix run .#start -- dev`.
+Use `nix run .#[SCRIPT] help` for more information about a script.
+Use `nix run` as an alias for `nix run .#start dev`.
 
-#### TODO `nix run .#start -- help`
-
-```sh
-Start the app locally.
-
-Usage:
-  nix run .#start -- [SCRIPT]
-
-Scripts:
-  help  --help  -h  Print this helpful information
-  dev               Run all servers from their source code with hot-reloading where possible, and without Docker where possible
-  preview           Build the app, then run the build results without Docker where possible
-  container         Build the app, package it into Docker containers, then run the docker containers
-```
-
-#### TODO `nix run .#init -- help`
+#### TODO `nix run .#init help`
 
 ```sh
 Initialize the app for deployment.
 
 Usage:
-  nix run .#init -- [SCRIPT]
+  nix run .#init [SCRIPT]
 
 Scripts:
   help  --help  -h  Print this helpful information
@@ -58,13 +43,13 @@ Scripts:
   prod              Stand up all hosting providers for a production deployment
 ```
 
-#### TODO `nix run .#deploy -- help`
+#### TODO `nix run .#deploy help`
 
 ```sh
 Deploy the app.
 
 Usage:
-  nix run .#deploy -- [SCRIPT]
+  nix run .#deploy [SCRIPT]
 
 Scripts:
   help  --help  -h  Print this helpful information
