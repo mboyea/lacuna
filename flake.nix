@@ -20,6 +20,9 @@
       # umami = import ./umami { inherit pkgs; };
     in rec {
       packages = {
+        help = pkgs.callPackage ./scripts/help.nix {
+          inherit name version;
+        };
         # init
         # deploy
         start = pkgs.callPackage ./scripts/start.nix {
@@ -32,6 +35,7 @@
         default = packages.start;
       };
       apps = {
+        help = utils.lib.mkApp { drv = packages.help; };
         # init
         # deploy
         start = utils.lib.mkApp { drv = packages.start; };

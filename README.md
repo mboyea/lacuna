@@ -29,24 +29,6 @@ Because Nix manages all dependencies, it is the only tool required to be install
 Use `nix run .#[SCRIPT] -- help` for more information about a script.
 Use `nix run` as an alias for `nix run .#start -- dev`.
 
-#### TODO `nix run .#help`
-
-```sh
-This is the Lacuna command line interface.
-
-Usage:
-  nix run .#[SCRIPT] -- [ARGUMENT]...
-
-Scripts:
-  help    Print this helpful information
-  start   Start the app locally
-  init    Initialize the app for deployment
-  deploy  Deploy the app
-
-Use "nix run .#[SCRIPT] -- help" for more information about a script.
-Use "nix run" as an alias for "nix run .#start -- dev".
-```
-
 #### TODO `nix run .#start -- help`
 
 ```sh
@@ -60,8 +42,6 @@ Scripts:
   dev               Run all servers from their source code with hot-reloading where possible, and without Docker where possible
   preview           Build the app, then run the build results without Docker where possible
   container         Build the app, package it into Docker containers, then run the docker containers
-
-Use "nix run" as an alias for "nix run .#start -- dev".
 ```
 
 #### TODO `nix run .#init -- help`
