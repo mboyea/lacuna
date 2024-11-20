@@ -4,13 +4,27 @@
   version,
 }: let
   start = rec {
-    # TODO implement dev and preview scripts
-    dev = null;
-    preview = null;
+    dev = pkgs.writeShellApplication {
+      name = "${name}-start-dev-${version}";
+      runtimeInputs = [
+      ];
+      text = ''
+        echo "TODO implement sveltekit dev script"
+      '';
+    };
+    preview = pkgs.writeShellApplication {
+      name = "${name}-start-preview-${version}";
+      runtimeInputs = [
+      ];
+      text = ''
+        echo "TODO implement sveltekit preview script"
+      '';
+    };
     main = pkgs.writeShellApplication {
       name = "${name}-start-main-${version}";
       runtimeInputs = [
-        help
+        dev
+        preview
       ];
       text = ''
         echo_error() {
@@ -19,6 +33,14 @@
         interpret_args() {
           while [[ $# -gt 0 ]]; do
             case $1 in
+              dev)
+                : "''${script:="${pkgs.lib.getExe dev}"}"
+                shift
+              ;;
+              preview)
+                : "''${script:="${pkgs.lib.getExe preview}"}"
+                shift
+              ;;
               *)
                 additional_args+=("$1")
                 shift
@@ -41,18 +63,3 @@
     };
   };
 in start.main
-# pkgs.stdenv.mkDerivation rec {
-#   pname = "${name}-start";
-#   inherit version;
-#   src = ./.;
-#   phases = [ "installPhase" ];
-#   buildInputs = [
-#     start.main
-#   ];
-#   installPhase = ''
-#     mkdir -p $out/bin/
-#     cp ${pkgs.lib.getExe start.main} $out/bin/main.sh
-#     chmod +x $out/bin/main.sh
-#   '';
-#   meta.mainProgram = "main.sh";
-# }

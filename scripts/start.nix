@@ -24,30 +24,40 @@
         echo "  container         Build the app, package it into Docker containers, then run the docker containers"
       '';
     };
-    # TODO implement dev script
     dev = pkgs.writeShellApplication {
       name = "${name}-start-dev-${version}";
       runtimeInputs = [
         webServer
       ];
       text = ''
-        ${pkgs.lib.getExe webServer} "$@"
+        ${pkgs.lib.getExe webServer} dev "$@"
       '';
     };
-    # TODO implement preview script
     preview = pkgs.writeShellApplication {
       name = "${name}-start-preview-${version}";
       runtimeInputs = [
         webServer
       ];
       text = ''
-        ${pkgs.lib.getExe webServer} "$@"
+        ${pkgs.lib.getExe webServer} preview "$@"
+      '';
+    };
+    container = pkgs.writeShellApplication {
+      name = "${name}-start-container-${version}";
+      runtimeInputs = [
+        webServer
+      ];
+      text = ''
+        echo "TODO implement container script"
       '';
     };
     main = pkgs.writeShellApplication {
       name = "${name}-start-main-${version}";
       runtimeInputs = [
         help
+        dev
+        preview
+        container
       ];
       text = ''
         set -- "$@" ${pkgs.lib.strings.concatStringsSep " " cliArgs}
@@ -61,6 +71,18 @@
             case $1 in
               help|--help|-h)
                 : "''${script:="${pkgs.lib.getExe help}"}"
+                shift
+              ;;
+              dev)
+                : "''${script:="${pkgs.lib.getExe dev}"}"
+                shift
+              ;;
+              preview)
+                : "''${script:="${pkgs.lib.getExe preview}"}"
+                shift
+              ;;
+              container)
+                : "''${script:="${pkgs.lib.getExe container}"}"
                 shift
               ;;
               *)
