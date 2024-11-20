@@ -7,17 +7,30 @@
     dev = pkgs.writeShellApplication {
       name = "${name}-start-dev-${version}";
       runtimeInputs = [
+        pkgs.pnpm
+        pkgs.nodejs
+        pkgs.git
       ];
       text = ''
-        echo "TODO implement sveltekit dev script"
+        base_dir="$(git rev-parse --show-toplevel)/sveltekit"
+        cd "$base_dir"
+        pnpm i
+        pnpm run dev
       '';
     };
     preview = pkgs.writeShellApplication {
       name = "${name}-start-preview-${version}";
       runtimeInputs = [
+        pkgs.pnpm
+        pkgs.nodejs
+        pkgs.git
       ];
       text = ''
-        echo "TODO implement sveltekit preview script"
+        base_dir="$(git rev-parse --show-toplevel)/sveltekit"
+        cd "$base_dir"
+        pnpm i
+        pnpm run build
+        pnpm run preview
       '';
     };
     main = pkgs.writeShellApplication {
