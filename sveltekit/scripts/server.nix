@@ -2,7 +2,10 @@
   pname = "${name}-server";
   inherit version;
   src = ./.;
-  buildInputs = [ pnpm nodejs ];
+  buildInputs = [
+    nodejs
+    pnpm
+  ];
   buildPhase = ''
     pnpm run build
   '';

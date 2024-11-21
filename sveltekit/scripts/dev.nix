@@ -3,11 +3,12 @@
   runtimeInputs = [
     pkgs.nodejs
     pkgs.pnpm
+    pkgs.git
   ];
   text = ''
-    #!/bin/sh
-    # pnpm run dev
-    echo "Hello, World!"
-    echo "I'm inside sveltekit/nix/dev.nix!"
+    base_dir="$(git rev-parse --show-toplevel)/sveltekit"
+    cd "$base_dir"
+    pnpm i
+    pnpm run dev
   '';
 }

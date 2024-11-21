@@ -6,10 +6,19 @@
   version = nodePackage.version;
 in rec {
   packages = {
-    start = pkgs.callPackage ./scripts/start.nix {
+    dev = pkgs.callPackage ./scripts/dev.nix {
       inherit pkgs name version;
     };
-    default = packages.start;
+    preview = pkgs.callPackage ./scripts/preview.nix {
+      inherit pkgs name version;
+    };
+    # image = pkgs.callPackage ./scripts/image.nix {
+    #   inherit pkgs name version;
+    #   server = pkgs.callPackage ./scripts/server.nix {
+    #     inherit pkgs name version;
+    #   };
+    # };
+    default = packages.dev;
   };
   devShells.default = import ./shell.nix { inherit pkgs; };
 }

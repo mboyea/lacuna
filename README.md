@@ -72,11 +72,11 @@ TODO
 
 TODO
 
-#### Database Inspector
+#### User Manager
 
 TODO
 
-#### User Manager
+#### Database Inspector
 
 TODO
 

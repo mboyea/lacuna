@@ -27,10 +27,10 @@
         # deploy
         start = pkgs.callPackage ./scripts/start.nix {
           inherit name version;
-          webServer = sveltekit.packages.start;
-          # database = postgresql.packages.start;
-          # authServer = keycloak.packages.start;
-          # trackingServer = umami.packages.start;
+          webServer = sveltekit.packages;
+          # database = postgresql.packages;
+          # authServer = keycloak.packages;
+          # trackingServer = umami.packages;
         };
         default = packages.start;
       };

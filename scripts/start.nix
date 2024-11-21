@@ -27,37 +27,37 @@
     dev = pkgs.writeShellApplication {
       name = "${name}-start-dev-${version}";
       runtimeInputs = [
-        webServer
+        webServer.dev
       ];
       text = ''
-        ${pkgs.lib.getExe webServer} dev "$@"
+        ${pkgs.lib.getExe webServer.dev} "$@"
       '';
     };
     preview = pkgs.writeShellApplication {
       name = "${name}-start-preview-${version}";
       runtimeInputs = [
-        webServer
+        webServer.preview
       ];
       text = ''
-        ${pkgs.lib.getExe webServer} preview "$@"
+        ${pkgs.lib.getExe webServer.preview} "$@"
       '';
     };
-    container = pkgs.writeShellApplication {
-      name = "${name}-start-container-${version}";
-      runtimeInputs = [
-        webServer
-      ];
-      text = ''
-        echo "TODO implement container script"
-      '';
-    };
+    # container = pkgs.writeShellApplication {
+    #   name = "${name}-start-container-${version}";
+    #   runtimeInputs = [
+    #     webServer.image.stream
+    #   ];
+    #   text = ''
+    #     echo "TODO implement container script"
+    #   '';
+    # };
     main = pkgs.writeShellApplication {
       name = "${name}-start-main-${version}";
       runtimeInputs = [
         help
         dev
         preview
-        container
+        # container
       ];
       text = ''
         set -- "$@" ${pkgs.lib.strings.concatStringsSep " " cliArgs}
@@ -81,10 +81,10 @@
                 : "''${script:="${pkgs.lib.getExe preview}"}"
                 shift
               ;;
-              container)
-                : "''${script:="${pkgs.lib.getExe container}"}"
-                shift
-              ;;
+              # container)
+              #   : "''${script:="''${pkgs.lib.getExe container}"}"
+              #   shift
+              # ;;
               *)
                 additional_args+=("$1")
                 shift
