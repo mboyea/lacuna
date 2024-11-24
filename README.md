@@ -10,7 +10,7 @@ default_: report
 
 The goal is to *get out of the way of software engineers* and enable them to construct highly custom websites for their clients.
 
-Lacuna provides [simplicity](#simplicity), [security](#security), [scalability](#scalability), and [freedom](#freedom).
+Lacuna provides [simplicity](#simplicity), [security](#security), [performance](#performance), and [freedom](#freedom).
 
 ### Scripts
 
@@ -112,14 +112,12 @@ The Docker containers are designed to be as minimal as possible, containing only
 This way the application has a very small attack surface.
 Because each part of the app is in a seperate Docker container, a breach of one doesn't compromise the entire application.
 
-#### Scalability
+#### Performance
 
-Your software is only as scalable as its dependencies.
-PostgreSQL, Node.js, and Keycloak each have excellent guides for scaling their servers, so Lacuna will scale as large as you could need.
-If a dependency or hosting provider no longer meets your needs, it's easy to replace them with another since Lacuna is highly modular and designed to run anywhere.
-
-With Lacuna, it *is* up to the programmer to choose the best direction for scaling the software.
-This *would* require expertise with the associated tools.
+Your software is only as fast as its dependencies.
+PostgreSQL, Vite, and Keycloak each have excellent community support for keeping them performant at scale.
+Servers can be deployed anywhere in the world to minimize latency.
+If a dependency or hosting provider no longer meets your needs, it's easy to replace them with another.
 
 ### How to contribute?
 
