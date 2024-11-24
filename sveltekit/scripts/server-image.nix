@@ -1,5 +1,5 @@
 { pkgs, name, version, server }: let
-  name = "${name}-image";
+  name = "${name}-server-image";
   tag = version;
   baseImage = null;
 in {
