@@ -12,9 +12,9 @@ in rec {
     preview = pkgs.callPackage ./scripts/preview.nix {
       inherit pkgs name version;
     };
-    # server = pkgs.callPackage ./scripts/server.nix {
-    #   inherit pkgs name version;
-    # };
+    server = pkgs.callPackage ./scripts/server.nix {
+      inherit pkgs name version;
+    };
     # serverImage = pkgs.callPackage ./scripts/server-image.nix {
     #   inherit pkgs name version;
     #   server = packages.server;
