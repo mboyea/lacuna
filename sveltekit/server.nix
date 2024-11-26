@@ -1,8 +1,13 @@
-{ pkgs, name, version } : pkgs.stdenv.mkDerivation rec {
+{
+  pkgs,
+  name,
+  version
+} : pkgs.stdenv.mkDerivation rec {
   pname = "${name}-server";
   inherit version;
   src = ./.;
   buildInputs = [
+    pkgs.git
     pkgs.pnpm
   ];
   buildPhase = ''
@@ -15,7 +20,6 @@
     # cp -rv build $out/lib
     # cp -rv $src/build $out/lib
     echo "TODO install the server built by SvelteKit"
-
 
     cat > $out/bin/${pname} << EOF
     #!/bin/sh
