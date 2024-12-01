@@ -2,13 +2,23 @@
   pkgs,
   name,
   version
-} : pkgs.buildNpmPackage {
+} : pkgs.stdenv.mkDerivation {
   pname = "${name}-server";
   inherit version;
   src = ./.;
-  npmBuildScript = "build";
-  # ? figure out how to override fetchNpmDeps with fetchPnpmDeps
+  installPhase = ''
+    mkdir -p $out/bin $out/lib
+    # cp -rv build $out/lib
+    # cp -rv $src/build $out/lib
+  '';
 }
+
+# pkgs.buildNpmPackage {
+#   pname = "${name}-server";
+#   inherit version;
+#   src = ./.;
+#   npmBuildScript = "build";
+# }
 
 # ! Requires package-lock.json, not provided by pnpm
 # pkgs.buildNpmPackage {
