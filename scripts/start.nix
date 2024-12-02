@@ -1,7 +1,7 @@
 {
-  pkgs ? import <nixpkgs> {},
-  name ? "test",
-  version ? "0.0.0",
+  pkgs,
+  name,
+  version,
   webServer,
   # database,
   # authServer,
@@ -30,16 +30,16 @@
         ${pkgs.lib.getExe webServer.dev} "$@"
       '';
     };
-    preview = pkgs.writeShellApplication {
-      name = "${name}-start-preview-${version}";
+    prod = pkgs.writeShellApplication {
+      name = "${name}-start-prod-${version}";
       text = ''
-        ${pkgs.lib.getExe webServer.preview} "$@"
+        ${pkgs.lib.getExe webServer.server} "$@"
       '';
     };
     container = pkgs.writeShellApplication {
       name = "${name}-start-container-${version}";
       text = ''
-        ${pkgs.lib.getExe webServer.server} "$@"
+        # {pkgs.lib.getExe webServer.serverImage} "$@"
         echo "TODO implement container script"
       '';
     };
@@ -63,8 +63,8 @@
                 : "''${script:="${pkgs.lib.getExe dev}"}"
                 shift
               ;;
-              preview)
-                : "''${script:="${pkgs.lib.getExe preview}"}"
+              prod)
+                : "''${script:="${pkgs.lib.getExe prod}"}"
                 shift
               ;;
               container)
