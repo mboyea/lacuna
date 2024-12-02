@@ -1,7 +1,7 @@
 {
-  pkgs,
-  name,
-  version
+  pkgs ? import <nixpkgs> {},
+  name ? "test",
+  version ? "0.0.0",
 }: pkgs.writeShellApplication {
   name = "${name}-help-${version}";
   text = ''

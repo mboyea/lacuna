@@ -1,4 +1,9 @@
-{ pkgs, name, version, server }: let
+{
+  pkgs ? import <nixpkgs> {},
+  name ? "test",
+  version ? "0.0.0",
+  server ? pkgs.callPackage ./server.nix { inherit pkgs; }
+}: let
   name = "${name}-server-image";
   tag = version;
   baseImage = null;

@@ -20,12 +20,12 @@
       # umami = import ./umami { inherit pkgs; };
     in rec {
       packages = {
-        help = pkgs.callPackage ./nix/help.nix {
+        help = pkgs.callPackage ./scripts/help.nix {
           inherit name version;
         };
         # init
         # deploy
-        start = pkgs.callPackage ./nix/start.nix {
+        start = pkgs.callPackage ./scripts/start.nix {
           inherit name version;
           webServer = sveltekit.packages;
           # database = postgres.packages;
