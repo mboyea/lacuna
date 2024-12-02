@@ -5,7 +5,7 @@
 } : pkgs.buildNpmPackage rec {
   pname = "${name}-server";
   inherit version;
-  src = ./.;
+  src = ../.;
   # Generate a new hash using:
   #   nix develop
   #   cd path/to/sveltekit
