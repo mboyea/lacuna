@@ -3,7 +3,7 @@
   inputs = {
     # get new revision # using:           git ls-remote https://github.com/<repo_path> | grep HEAD
     # pin dependency to revision # like:  url = "github:numtide/flake-utils?rev=#"
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs = { self, nixpkgs, flake-utils, ... }: let
