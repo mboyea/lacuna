@@ -40,13 +40,13 @@
     container = pkgs.writeShellApplication {
       name = "${name}-start-container-${version}";
       text = let
-        serverImageContainer = pkgs.callPackage ./mk-container.nix {
+        webServerImageContainer = pkgs.callPackage ./mk-container.nix {
           inherit pkgs name version;
           image = webServer.serverImage;
           ports = "3000:3000";
         };
       in ''
-        ${pkgs.lib.getExe serverImageContainer} "$@"
+        ${pkgs.lib.getExe webServerImageContainer} "$@"
       '';
     };
     main = pkgs.writeShellApplication {
