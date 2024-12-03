@@ -9,6 +9,7 @@
   cliArgs ? []
 }: let
   start = rec {
+    # TODO: pull these out into hooks ? perhaps
     help = pkgs.writeShellApplication {
       name = "${name}-start-help-${version}";
       text = ''
