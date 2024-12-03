@@ -43,6 +43,7 @@
         serverImageContainer = pkgs.callPackage ./mk-container.nix {
           inherit pkgs name version;
           image = webServer.serverImage;
+          ports = "3000:3000";
         };
       in ''
         ${pkgs.lib.getExe serverImageContainer} "$@"

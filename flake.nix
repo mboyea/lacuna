@@ -49,6 +49,7 @@
         root = pkgs.mkShell {
           packages = [
             pkgs.podman
+            pkgs.psmisc # kill program at PORT using: fuser -k PORT/tcp
             pkgs.gzip
             pkgs.skopeo
           ];

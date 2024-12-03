@@ -11,9 +11,9 @@
     pkgs.podman
   ];
   text = ''
-    # ${image.stream} | podman image load
-    # podman container run --tty --publish ${ports} localhost/${image.name}:${image.tag} ${pkgs.lib.strings.concatStringsSep " " cliArgs}
-    echo "TODO: make podman run container"
+    ${image.stream} | podman image load
+    podman container run --tty --detach --publish ${ports} localhost/${image.name}:${image.tag} ${pkgs.lib.strings.concatStringsSep " " cliArgs}
+    podman container attach --latest
   '';
 }
 

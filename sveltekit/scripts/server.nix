@@ -1,7 +1,8 @@
 {
   pkgs ? import <nixpkgs> {},
   name ? "test",
-  version ? "0.0.0"
+  version ? "0.0.0",
+  runtimeShell ? pkgs.bash
 } : pkgs.buildNpmPackage rec {
   pname = "${name}-server";
   inherit version;
@@ -19,7 +20,7 @@
     cp -rv package.json $out/lib
 
     cat > $out/bin/${pname} << EOF
-    #!/bin/sh
+    #!${runtimeShell}
     ${pkgs.lib.getExe pkgs.nodejs} $out/lib/build
     EOF
 
