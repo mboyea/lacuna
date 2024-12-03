@@ -76,7 +76,7 @@ Scripts:
 Database by PostgreSQL.
 Authentication by Keycloak.
 Web Analytics by Umami.
-Web Server by SvelteKit (Vite).
+Web Server by SvelteKit (Node).
 
 #### Content Editor
 
