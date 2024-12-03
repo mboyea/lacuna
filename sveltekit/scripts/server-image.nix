@@ -4,7 +4,7 @@
   version ? "0.0.0",
   server ? pkgs.callPackage ./server.nix { inherit pkgs; }
 }: let
-  name = "${name}-server-image";
+  name' = "${name}-server-image";
   tag = version;
   baseImage = null;
   # EXAMPLE:
@@ -22,9 +22,11 @@
   #   arch = "amd64";
   # };
 in {
-  inherit name version tag;
+  name = name';
+  inherit version tag;
   stream = pkgs.dockerTools.streamLayeredImage {
-    inherit name tag;
+    name = name';
+    inherit tag;
     fromImage = baseImage;
     contents = [ server ];
     config = {
@@ -33,5 +35,5 @@ in {
         "4173/tcp" = {};
       };
     };
-  }
+  };
 }

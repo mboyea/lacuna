@@ -39,9 +39,13 @@
     };
     container = pkgs.writeShellApplication {
       name = "${name}-start-container-${version}";
-      text = ''
-        # {pkgs.lib.getExe webServer.serverImage} "$@"
-        echo "TODO implement container script"
+      text = let
+        serverImageContainer = pkgs.callPackage ./mk-container.nix {
+          inherit pkgs name version;
+          image = webServer.serverImage;
+        };
+      in ''
+        ${pkgs.lib.getExe serverImageContainer} "$@"
       '';
     };
     main = pkgs.writeShellApplication {
