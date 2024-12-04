@@ -143,7 +143,7 @@ If a dependency or hosting provider no longer meets your needs, it's easy to rep
 - Create reproducible development environments.
 - Compile apps into production-ready build packages.
 - Containerize packages into Docker images.
-- Deploy docker images to any target hosting provider.
+- Deploy docker images to a target hosting provider.
 
 Lacuna scripts are declared as a function of submodules in `flake.nix`.
 
