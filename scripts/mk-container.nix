@@ -17,4 +17,3 @@
     podman container attach --latest
   '';
 }
-

@@ -15,7 +15,7 @@
       pkgs = import nixpkgs { inherit system; };
       # ? TODO use some map function to generate the code for the list of directories
       sveltekit = import ./sveltekit { inherit pkgs; };
-      # postgres = import ./postgres { inherit pkgs; };
+      postgres = import ./postgres { inherit pkgs; };
       # keycloak = import ./keycloak { inherit pkgs; };
       # umami = import ./umami { inherit pkgs; };
     in rec {
@@ -28,7 +28,7 @@
         start = pkgs.callPackage ./scripts/start.nix {
           inherit name version;
           webServer = sveltekit.packages;
-          # database = postgres.packages;
+          database = postgres.packages;
           # authServer = keycloak.packages;
           # trackingServer = umami.packages;
         };
@@ -43,7 +43,7 @@
       };
       devShells = {
         sveltekit = sveltekit.devShells.default;
-        # postgres = postgres.devShells.default;
+        postgres = postgres.devShells.default;
         # keycloak = keycloak.devShells.default;
         # umami = umami.devShells.default;
         root = pkgs.mkShell {
@@ -58,7 +58,7 @@
           inputsFrom = [
             devShells.root
             devShells.sveltekit
-            # devShells.postgres
+            devShells.postgres
             # devShells.keycloak
             # devShells.umami
           ];

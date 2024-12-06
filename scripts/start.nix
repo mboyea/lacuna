@@ -3,12 +3,23 @@
   name,
   version,
   webServer,
-  # database,
+  database,
   # authServer,
   # trackingServer,
   cliArgs ? []
 }: let
-  start = rec {
+  start = let
+    webServerImageContainer = pkgs.callPackage ./mk-container.nix {
+      inherit pkgs name version;
+      image = webServer.serverImage;
+      ports = "3000:3000";
+    };
+    databaseImageContainer = pkgs.callPackage ./mk-container.nix {
+      inherit pkgs name version;
+      image = database.serverImage;
+      ports = "5432:5432";
+    };
+  in rec {
     # TODO: pull these out into hooks ? perhaps
     help = pkgs.writeShellApplication {
       name = "${name}-start-help-${version}";
@@ -29,24 +40,21 @@
       name = "${name}-start-dev-${version}";
       text = ''
         ${pkgs.lib.getExe webServer.dev} "$@"
+        # TODO ${pkgs.lib.getExe databaseImageContainer} "$@"
       '';
     };
     prod = pkgs.writeShellApplication {
       name = "${name}-start-prod-${version}";
       text = ''
         ${pkgs.lib.getExe webServer.server} "$@"
+        # TODO ${pkgs.lib.getExe databaseImageContainer} "$@"
       '';
     };
-    container = let
-      webServerImageContainer = pkgs.callPackage ./mk-container.nix {
-        inherit pkgs name version;
-        image = webServer.serverImage;
-        ports = "3000:3000";
-      };
-    in pkgs.writeShellApplication {
+    container = pkgs.writeShellApplication {
       name = "${name}-start-container-${version}";
       text = ''
         ${pkgs.lib.getExe webServerImageContainer} "$@"
+        # TODO ${pkgs.lib.getExe databaseImageContainer} "$@"
       '';
     };
     main = pkgs.writeShellApplication {

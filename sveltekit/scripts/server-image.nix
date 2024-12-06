@@ -7,12 +7,12 @@
   name' = "${name}-server-image";
   tag = version;
   baseImage = null;
+  # # update base image using variables from:
+  # #   xdg-open https://hub.docker.com/_/busybox/tags
+  # #   nix-shell -p nix-prefetch-docker
+  # #   nix-prefetch-docker --quiet --image-name busybox --image-tag 1.37.0"; --image-digest sha256:bd39d7ac3f02301aec35d27a633d643770c0c4073c5b8cb588b1680c4f1e84e5
   # EXAMPLE:
   # pkgs.dockerTools.pullImage {
-  #   # variables to update base image found using:
-  #   # xdg-open https://hub.docker.com/_/busybox/tags
-  #   # nix develop
-  #   # nix-prefetch-docker --quiet --image-name busybox --image-tag 1.37.0 --image-digest sha256:bd39d7ac3f02301aec35d27a633d643770c0c4073c5b8cb588b1680c4f1e84e5
   #   imageName = "busybox";
   #   imageDigest ="sha256:bd39d7ac3f02301aec35d27a633d643770c0c4073c5b8cb588b1680c4f1e84e5";
   #   finalImageName = "busybox";
