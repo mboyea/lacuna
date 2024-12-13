@@ -2,7 +2,7 @@
   pkgs ? import <nixpkgs> {},
   name ? "test",
   version ? "0.0.0",
-  runtimeShell ? pkgs.bash
+  runtimeShell ? pkgs.runtimeShell
 } : pkgs.buildNpmPackage rec {
   pname = "${name}-server";
   inherit version;

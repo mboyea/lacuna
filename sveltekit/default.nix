@@ -15,7 +15,7 @@ in rec {
     server = pkgs.callPackage ./scripts/server.nix {
       inherit pkgs name version;
     };
-    serverImage = pkgs.callPackage ./scripts/server-image.nix {
+    dockerImage = pkgs.callPackage ./scripts/docker-image.nix {
       inherit pkgs name version;
       server = packages.server;
     };

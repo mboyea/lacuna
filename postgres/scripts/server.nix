@@ -2,7 +2,7 @@
 #   pkgs ? import <nixpkgs> {},
 #   name ? "test",
 #   version ? "0.0.0",
-#   runtimeShell ? pkgs.bash
+#   runtimeShell ? pkgs.runtimeShell
 # } : let
 #   dataDir = "data/postgres";
 #   logDir = "${dataDir}/logs";
@@ -28,7 +28,7 @@
 #     #!${runtimeShell}
 #     echo "TODO: start postgres server"
 #     # ? This fails because postgresql isn't a runtime dependency
-#     # ? Also I think more is required in for the postgres daemon to start
+#     # ? Also I think more is required for the postgres daemon to start
 #     pg_ctl -D "$out/${dataDir}" -l "$out/${logDir}" start
 #     EOF
 # 

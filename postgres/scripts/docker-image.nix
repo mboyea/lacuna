@@ -3,7 +3,7 @@
   name ? "test",
   version ? "0.0.0",
 }: let
-  name' = "${name}-server-image";
+  name' = "${name}-docker-image";
   tag = version;
   # update base image using variables from:
   #   xdg-open https://hub.docker.com/_/postgres/tags
@@ -25,11 +25,28 @@ in {
     name = name';
     inherit tag;
     fromImage = baseImage;
-    contents = [];
+    fakeRootCommands = ''
+      # ? to reproduce, `nix run` and use: podman exec --latest postgres --single postgres
+      docker-entrypoint.sh --single postgres <<- EOF
+        CREATE DATABASE lacuna'
+      EOF
+      # # ! currently this errors: "root" execution of the PostgreSQL server is not permitted.
+      # postgres --single postgres <<- EOF
+      #   SELECT 'CREATE DATABASE lacuna'
+      #   WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lacuna')\gexec
+      # EOF
+      # postgres --single lacuna <<- EOF
+        # $ {builtins.readFile ../schema/init-db.psql}
+      # EOF
+    '';
     config = {
+      # Env = [ "POSTGRES_PASSWORD=temp" ];
+      Cmd = [ "postgres" ];
+      Entrypoint = [ "docker-entrypoint.sh" ];
       ExposedPorts = {
         "5432/tcp" = {};
       };
     };
   };
+  
 }

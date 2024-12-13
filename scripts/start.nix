@@ -11,16 +11,24 @@
   start = let
     webServerImageContainer = pkgs.callPackage ./mk-container.nix {
       inherit pkgs name version;
-      image = webServer.serverImage;
-      ports = "3000:3000";
+      image = webServer.dockerImage;
+      podmanArgs = [
+        "--publish"
+        "3000:3000"
+      ];
     };
     databaseImageContainer = pkgs.callPackage ./mk-container.nix {
       inherit pkgs name version;
-      image = database.serverImage;
-      ports = "5432:5432";
+      image = database.dockerImage;
+      podmanArgs = [
+        "--publish"
+        "5432:5432"
+        "--env"
+        "POSTGRES_PASSWORD=temp"
+      ];
     };
   in rec {
-    # TODO: pull these out into hooks ? perhaps
+    # ? TODO: restructure to use mkDerviation where we declare helpHook, devHook, prodHook, etc
     help = pkgs.writeShellApplication {
       name = "${name}-start-help-${version}";
       text = ''
@@ -39,8 +47,16 @@
     dev = pkgs.writeShellApplication {
       name = "${name}-start-dev-${version}";
       text = ''
+        pids=()
+        kill_programs() {
+          for pid in "''${pids[@]}" ; do
+            kill "$pid";
+          done
+        }
+        trap kill_programs EXIT
+        ${pkgs.lib.getExe databaseImageContainer} "$@" &
+        pids+=($!)
         ${pkgs.lib.getExe webServer.dev} "$@"
-        # TODO ${pkgs.lib.getExe databaseImageContainer} "$@"
       '';
     };
     prod = pkgs.writeShellApplication {
