@@ -11,7 +11,6 @@
     pkgs.podman
   ];
   text = ''
-    # TODO generate image stream at compile time
     ${image.stream} | podman image load
     podman container run --tty --detach ${pkgs.lib.strings.concatStringsSep " " podmanArgs} localhost/${image.name}:${image.tag} ${pkgs.lib.strings.concatStringsSep " " imageArgs}
     podman container attach --latest

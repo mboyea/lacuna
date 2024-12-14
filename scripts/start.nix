@@ -23,10 +23,13 @@
       podmanArgs = [
         "--publish"
         "5432:5432"
+        # ? TODO: use nix-sops to pull in secrets
         "--env"
         "POSTGRES_PASSWORD=temp"
-        # ? TODO: use nix-sops to pull in secrets
-        # "POSTGRES_PASSWORD=${"PG_PASSWORD"}"
+        # "--env"
+        # "POSTGRES_USER=lacuna"
+        # "--env"
+        # "POSTGRES_DB=lacuna"
       ];
     };
   in rec {
@@ -52,15 +55,14 @@
         pids=()
         kill_programs() {
           kill "''${pids[@]}"
-          # wait "''${pids[@]}"
-          # for pid in "''${pids[@]}" ; do
-          #   while kill -0 "$pid"; do
-          #     sleep 0.1
-          #   done
-          # done
-          # kill "$pid"
-          # wait "$pid" 2>/dev/null
+          for pid in "''${pids[@]}" ; do
+            wait "$pid" 2>/dev/null
+            while kill -0 "$pid"; do
+              sleep 0.1
+            done
+          done
         }
+        # ? use screen to start all programs
         trap kill_programs EXIT
         ${pkgs.lib.getExe databaseImageContainer} "$@" &
         pids+=($!)

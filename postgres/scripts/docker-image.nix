@@ -3,7 +3,7 @@
   name ? "test",
   version ? "0.0.0",
 }: let
-  name' = "${name}-docker-image";
+  _name = "${name}-docker-image";
   tag = version;
   # update base image using variables from:
   #   xdg-open https://hub.docker.com/_/postgres/tags
@@ -19,30 +19,31 @@
     arch = "amd64";
   };
 in {
-  name = name';
+  name = _name;
   inherit version tag;
+  # ? for compile-time images, consider switching to: https://github.com/nlewo/nix2container
   stream = pkgs.dockerTools.streamLayeredImage {
-    name = name';
+    name = _name;
     inherit tag;
     fromImage = baseImage;
+    enableFakechroot = true;
     fakeRootCommands = ''
-      # ! https://stackoverflow.com/questions/26598738/how-to-create-user-database-in-script-for-docker-postgres
-      # TODO: instead of this, populate /docker-entrypoint-initdb.d/
-      docker-entrypoint.sh --single postgres <<- EOF
-        CREATE DATABASE lacuna
+      mkdir -p /docker-entrypoint-initdb.d
+
+      cat > /docker-entrypoint-initdb.d/init.sql <<- EOF
+        -- CREATE DATABASE IF NOT EXISTS lacuna
+        SELECT 'CREATE DATABASE lacuna'
+        WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lacuna')\gexec
+
+        -- USE lacuna
+        \c lacuna
+
+        ${builtins.readFile ../schema/init-db.psql}
       EOF
-      # ? to reproduce, `nix run` and use: podman exec --latest postgres --single postgres
-      # # ! currently this errors: "root" execution of the PostgreSQL server is not permitted.
-      # postgres --single postgres <<- EOF
-      #   SELECT 'CREATE DATABASE lacuna'
-      #   WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lacuna')\gexec
-      # EOF
-      # postgres --single lacuna <<- EOF
-        # $ {builtins.readFile ../schema/init-db.psql}
-      # EOF
     '';
     config = {
       # Env = [ "POSTGRES_PASSWORD=temp" ];
+      # ? podman exec --tty --interactive --latest psql -U postgres lacuna
       Cmd = [ "postgres" ];
       Entrypoint = [ "docker-entrypoint.sh" ];
       ExposedPorts = {

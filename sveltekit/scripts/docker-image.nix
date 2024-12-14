@@ -4,14 +4,14 @@
   version ? "0.0.0",
   server ? pkgs.callPackage ./server.nix { inherit pkgs; }
 }: let
-  name' = "${name}-docker-image";
+  _name = "${name}-docker-image";
   tag = version;
   baseImage = null;
 in {
-  name = name';
+  name = _name;
   inherit version tag;
   stream = pkgs.dockerTools.streamLayeredImage {
-    name = name';
+    name = _name;
     inherit tag;
     fromImage = baseImage;
     contents = [ server ];
