@@ -26,10 +26,12 @@ in {
     inherit tag;
     fromImage = baseImage;
     fakeRootCommands = ''
-      # ? to reproduce, `nix run` and use: podman exec --latest postgres --single postgres
+      # ! https://stackoverflow.com/questions/26598738/how-to-create-user-database-in-script-for-docker-postgres
+      # TODO: instead of this, populate /docker-entrypoint-initdb.d/
       docker-entrypoint.sh --single postgres <<- EOF
-        CREATE DATABASE lacuna'
+        CREATE DATABASE lacuna
       EOF
+      # ? to reproduce, `nix run` and use: podman exec --latest postgres --single postgres
       # # ! currently this errors: "root" execution of the PostgreSQL server is not permitted.
       # postgres --single postgres <<- EOF
       #   SELECT 'CREATE DATABASE lacuna'

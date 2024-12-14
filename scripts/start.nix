@@ -25,6 +25,8 @@
         "5432:5432"
         "--env"
         "POSTGRES_PASSWORD=temp"
+        # ? TODO: use nix-sops to pull in secrets
+        # "POSTGRES_PASSWORD=${"PG_PASSWORD"}"
       ];
     };
   in rec {
@@ -49,9 +51,15 @@
       text = ''
         pids=()
         kill_programs() {
-          for pid in "''${pids[@]}" ; do
-            kill "$pid";
-          done
+          kill "''${pids[@]}"
+          # wait "''${pids[@]}"
+          # for pid in "''${pids[@]}" ; do
+          #   while kill -0 "$pid"; do
+          #     sleep 0.1
+          #   done
+          # done
+          # kill "$pid"
+          # wait "$pid" 2>/dev/null
         }
         trap kill_programs EXIT
         ${pkgs.lib.getExe databaseImageContainer} "$@" &
