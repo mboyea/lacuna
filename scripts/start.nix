@@ -126,6 +126,9 @@
             "$script" "''${additional_args[@]}"
           else
             echo_error "No valid script identified among arguments:" "''${additional_args[@]}"
+            echo
+            echo "See start-help:"
+            ${pkgs.lib.getExe help}
             exit 1
           fi
         }
