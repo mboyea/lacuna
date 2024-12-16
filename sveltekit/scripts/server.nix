@@ -12,7 +12,7 @@
   #   cd path/to/sveltekit
   #   npm i --package-lock-only
   #   prefetch-npm-deps package-lock.json
-  npmDepsHash = "sha256-miLecgXG6a4mMUA728pBITSgNQSESKnCEyUte73dwX0=";
+  npmDepsHash = "sha256-ThHvyW0noBgoihIZIEzOfmUap4TGv/wj/S9wqJJ8aTA=";
   npmBuildScript = "build";
   installPhase = ''
     mkdir -p $out/bin $out/lib
