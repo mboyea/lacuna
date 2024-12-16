@@ -21,7 +21,7 @@ So the first step is to make your own copy!
 - [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo).
 - [Clone *your forked repository*](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) from GitHub to your computer.
 
-Because Nix manages all dependencies, it is the only tool required to be installed manually.
+Because Nix manages all packages, it is the only dependency required to be installed manually.
 
 - [Install Nix](https://nixos.org/download/).
 - [Enable Flakes](https://nixos.wiki/wiki/Flakes).
@@ -30,7 +30,9 @@ Now you're ready to run the project scripts!
 
 ### Scripts
 
-Lacuna scripts are declared in `flake.nix`.
+Scripts can be run from within any of the project directories.
+
+Use `nix run .#[SCRIPT] help` for more information about a script.
 
 | Command | Description |
 |:--- |:--- |
@@ -40,36 +42,7 @@ Lacuna scripts are declared in `flake.nix`.
 | `nix run .#deploy` | deploy the app |
 | `nix run .#init` | initialize the app for deployment |
 
-Use `nix run .#[SCRIPT] help` for more information about a script.
-Use `nix run` as an alias for `nix run .#start dev`.
-
-#### TODO `nix run .#init help`
-
-```sh
-Initialize the app for deployment.
-
-Usage:
-  nix run .#init [SCRIPT]
-
-Scripts:
-  help  --help  -h  Print this helpful information
-  stage             Stand up all hosting providers for a staging deployment
-  prod              Stand up all hosting providers for a production deployment
-```
-
-#### TODO `nix run .#deploy help`
-
-```sh
-Deploy the app.
-
-Usage:
-  nix run .#deploy [SCRIPT]
-
-Scripts:
-  help  --help  -h  Print this helpful information
-  stage             Build the app, package it into Docker containers, then deploy the docker containers for staging
-  prod              Build the app, package it into Docker containers, then deploy the docker containers for production
-```
+Lacuna scripts are declared in `flake.nix`, and defined in `scripts/`.
 
 ### Features
 
@@ -102,38 +75,49 @@ TODO
 
 Lacuna is forever free to use, both privately and commercially.
 
-Lacuna is designed to run anywhere.
-Its parts are compiled to small docker containers.
-You can host the docker containers on one server, across multiple servers, or in a distributed cloud computing network.
+It's designed to run anywhere.
+Each part is compiled to a small Docker container.
+You can host the Docker containers on one server, across multiple servers, or in a distributed cloud computing network.
 You aren't locked in to using any vendor, and thus you can always change to a different server provider if something isn't working out.
 
-This is a highly modular codebase.
-You are free to add, remove, or replace any part of Lacuna, and the rest will function just the same.
-You aren't locked in to using any dependency, and thus anything is possible.
+This is a modular codebase that focuses on extensibility.
+You are free to add, remove, replace, or modify any part of Lacuna; the rest will function just the same.
+Because you aren't locked in to using any dependency, anything is possible.
 
 #### Simplicity
 
-For the developer, Lacuna provides complete control using well-known tools.
-Code-only solutions means no more complicated plugin systems with odd limitations.
+Lacuna is minimal and clear.
 
-For the client, Lacuna provides an approachable user interface, with every relevant function available from one context menu.
-No clutter means no more confusing UI full of features you don't need.
+For the developer, Lacuna provides complete control using well-known tools.
+Code-only solutions means no more complicated plugin systems with odd limitations and vulnerabilities.
+
+For the client, Lacuna provides an approachable user interface by default, with every relevant function available from one context menu.
+No clutter means no more confusing UI full of features your client doesn't need.
 
 #### Security
 
+Lacuna is designed for security.
+
 The dependencies of Lacuna were carefully chosen to be sure they're robust, well-supported, and secure.
-Umami (analytics), Keycloak (authentication), PostgreSQL (database), and Vite (web server) are all commonly used and well-tested.
+Umami (analytics), Keycloak (authentication), PostgreSQL (database), and Node (web server) are all commonly used and well-tested.
 
 The Docker containers are designed to be as minimal as possible, containing only what is required to run each server.
 This way the application has a very small attack surface.
-Because each part of the app is in a seperate Docker container, a breach of one doesn't compromise the entire application.
+Because each part of the app is in a separate Docker container, a breach of one doesn't compromise the entire application.
 
 #### Performance
+
+Lacuna is fast.
 
 Your software is only as fast as its dependencies.
 Node, PostgreSQL, and Keycloak each have excellent community support for keeping them performant at scale.
 Servers can be deployed anywhere in the world to minimize latency.
 If a dependency or hosting provider no longer meets your needs, it's easy to replace them with another.
+
+You shouldn't have to wait long for software to rebuild during development.
+Nix employs incremental builds, so when you change a part of your software it only rebuilds that part (derivation) that you're using and changing.
+Further, hot-module replacement is employed where possible to prevent the need to rebuild while modifying some modules like the SvelteKit webserver.
+Altogether, this significantly speeds up the feedback loop between development and testing.
 
 ### How does it work?
 
@@ -146,15 +130,16 @@ If a dependency or hosting provider no longer meets your needs, it's easy to rep
 - Deploy docker images to a target hosting provider.
 
 Lacuna scripts are declared as a function of submodules in `flake.nix`.
+Each script function is defined within the `scripts/` directory, and each submodule is defined by `default.nix` in its own subdirectory.
 
-When this project is more mature and commercially supported, documentation will be provided in `/docs`.
+When this project is more mature and commercially supported, complete documentation will be provided in `docs/`.
 Until then, please first do your best to read the code and understand it, starting at the entrypoint of the program in `flake.nix`.
-If you have any questions, feel free to post an Issue.
+If you have any questions, please post a GitHub Issue.
 
 ### How to contribute?
 
 This project doesn't support community contributions to the code base right now.
-You are free to post Issues in this repository, and if enough interest is generated, a process for pull requests will be provided.
+You are free to post Issues in this repository, and if enough interest is generated, a process for community pull requests will be provided.
 
 We are not currently receiving donations.
 There is no way to fund the project at this time, but if enough interested is generated, a process for donations will be provided.
