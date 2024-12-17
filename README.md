@@ -63,10 +63,6 @@ TODO
 
 TODO
 
-#### Database Inspector
-
-TODO
-
 ## FAQ
 
 ### Why Lacuna instead of a mainstream CMS?
