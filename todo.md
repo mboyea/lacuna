@@ -1,10 +1,10 @@
 ---
-title: Lacuna DevLog
+title: Lacuna Devlog
 author: [ Matthew T. C. Boyea ]
 lang: en
 date: November, 2024
 subject: project
-keywords: [ lacuna, cms, project, code, history, log ]
+keywords: [ lacuna, cms, project, docs, code, history, log ]
 default_: report
 ---
 

@@ -5,6 +5,6 @@
     pkgs.nodejs
     pkgs.pnpm
     pkgs.prefetch-npm-deps    # see server.nix
-    pkgs.nix-prefetch-docker  # see server-image.nix
+    pkgs.nix-prefetch-docker  # see docker-image.nix
   ];
 }
