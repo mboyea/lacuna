@@ -15,13 +15,10 @@ default_: report
 ## Milestones
 
 - [ ] (C) Fork to www-lacuna-com
-- [ ] ~~(B) Connect domain name www.lacunawebworks.com~~
-- [ ] (C) Draft Github Actions build pipeline to deploy `docs/` to GitHub pages @code @docs
 - [ ] (A) Announce release for +1.0.0 @docs
+- [ ] (C) Write documentation in `docs/` @docs
+- [ ] (C) Draft Github Actions build pipeline to deploy `docs/` to GitHub pages @code @docs
 - [ ] (B) Draft script `nix run .#deploy`
-- [ ] ~~(B) Draft fly packages.deploy~~
-- [ ] ~~(B) Draft fly packages.init~~
-- [ ] ~~(B) Draft secrets handling~~
 - [ ] (A) Draft sveltekit pages content editor
 - [ ] (A) Draft sveltekit /api/v1/pages
 - [ ] (A) Draft sveltekit PageRequests.ts (credit https://github.com/michael/editable-website)
