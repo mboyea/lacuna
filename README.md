@@ -40,7 +40,6 @@ Use `nix run .#[SCRIPT] help` for more information about a script.
 | `nix run .#help` | Print this helpful information |
 | `nix run .#start` | Start the app locally |
 | `nix run .#deploy` | Deploy the app |
-| `nix run .#init` | Initialize the app for deployment |
 
 Lacuna scripts are declared in `flake.nix`, and defined in `scripts/`.
 

@@ -64,16 +64,13 @@ script_start_help() {
   echo "Start the app locally."
   echo
   echo "Usage:"
+  echo "  nix run .#start          | Alias for \"nix run .#start help\""
   echo "  nix run .#start [SCRIPT] | Run the specified script"
   echo
   echo "SCRIPTS:"
   echo "  help --help -h | Print this helpful information"
   echo "  dev            | Run each server using devtools"
   echo "  prod           | Run each server in a container, as similar to the production server as possible"
-  echo
-  echo "If no argument is given, this help script is run."
-  echo "If the first argument corresponds to a script name, that script is run."
-  echo "If the first argument is not a recognized script, an error is thrown."
   echo
 }
 
