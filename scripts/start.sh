@@ -68,7 +68,7 @@ script_start_help() {
   echo
   echo "SCRIPTS:"
   echo "  help --help -h | Print this helpful information"
-  echo "  dev            | Run each server with devtools"
+  echo "  dev            | Run each server using devtools"
   echo "  prod           | Run each server in a container, as similar to the production server as possible"
   echo
   echo "If no argument is given, this help script is run."
