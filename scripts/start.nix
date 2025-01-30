@@ -10,7 +10,7 @@
   _name = "${name}-start-${version}";
   webServerDockerContainer = let
     image = webServer.dockerImage;
-  in pkgs.callPackage ../utils/mk-container.nix {
+  in pkgs.callPackage utils/mk-container.nix {
     inherit pkgs name version image;
     podmanArgs = [
       "--publish" "3000:3000"
@@ -19,7 +19,7 @@
   };
   databaseDockerContainer = let
     image = database.dockerImage;
-  in pkgs.callPackage ../utils/mk-container.nix {
+  in pkgs.callPackage utils/mk-container.nix {
     inherit pkgs name version image;
     podmanArgs = [
       "--publish" "5432:5432"
