@@ -4,137 +4,80 @@
   version,
   webServer,
   database,
-  # authServer,
-  # trackingServer,
+  envFiles ? []
   cliArgs ? []
 }: let
-  start = let
-    webServerImageContainer = pkgs.callPackage ./mk-container.nix {
-      inherit pkgs name version;
-      image = webServer.dockerImage;
-      podmanArgs = [
-        "--publish"
-        "3000:3000"
-      ];
-    };
-    databaseImageContainer = pkgs.callPackage ./mk-container.nix {
-      inherit pkgs name version;
-      image = database.dockerImage;
-      podmanArgs = [
-        "--publish"
-        "5432:5432"
-        # ? TODO: use nix-sops to pull in secrets
-        "--env"
-        "POSTGRES_PASSWORD=temp"
-        # "--env"
-        # "POSTGRES_USER=lacuna"
-        # "--env"
-        # "POSTGRES_DB=lacuna"
-      ];
-    };
-  in rec {
-    # ? TODO: restructure to use mkDerviation where we declare helpHook, devHook, prodHook, etc
-    help = pkgs.writeShellApplication {
-      name = "${name}-start-help-${version}";
-      text = ''
-        echo "Start the app locally."
-        echo
-        echo "Usage:"
-        echo "  nix run .#start [SCRIPT]"
-        echo
-        echo "Scripts:"
-        echo "  help  --help  -h  Print this helpful information"
-        echo "  dev               Run all servers from their source code with hot-reloading where possible, and without Docker where possible"
-        echo "  preview           Build the app, then run the build results without Docker where possible"
-        echo "  container         Build the app, package it into Docker containers, then run the docker containers"
-      '';
-    };
-    dev = pkgs.writeShellApplication {
-      name = "${name}-start-dev-${version}";
-      text = ''
-        pids=()
-        kill_programs() {
-          kill "''${pids[@]}"
-          for pid in "''${pids[@]}" ; do
-            wait "$pid" 2>/dev/null
-            while kill -0 "$pid"; do
-              sleep 0.1
-            done
-          done
-        }
-        # ? use screen to start all programs
-        trap kill_programs EXIT
-        ${pkgs.lib.getExe databaseImageContainer} "$@" &
-        pids+=($!)
-        ${pkgs.lib.getExe webServer.dev} "$@"
-      '';
-    };
-    prod = pkgs.writeShellApplication {
-      name = "${name}-start-prod-${version}";
-      text = ''
-        ${pkgs.lib.getExe webServer.server} "$@"
-        # TODO ${pkgs.lib.getExe databaseImageContainer} "$@"
-      '';
-    };
-    container = pkgs.writeShellApplication {
-      name = "${name}-start-container-${version}";
-      text = ''
-        ${pkgs.lib.getExe webServerImageContainer} "$@"
-        # TODO ${pkgs.lib.getExe databaseImageContainer} "$@"
-      '';
-    };
-    main = pkgs.writeShellApplication {
-      name = "${name}-start-main-${version}";
-      text = ''
-        set -- "$@" ${pkgs.lib.strings.concatStringsSep " " cliArgs}
-
-        echo_error() {
-          echo "Error in start-main:" "$@" 1>&2;
-        }
-
-        interpret_args() {
-          while [[ $# -gt 0 ]]; do
-            case $1 in
-              help|--help|-h)
-                : "''${script:="${pkgs.lib.getExe help}"}"
-                shift
-              ;;
-              dev)
-                : "''${script:="${pkgs.lib.getExe dev}"}"
-                shift
-              ;;
-              prod)
-                : "''${script:="${pkgs.lib.getExe prod}"}"
-                shift
-              ;;
-              container)
-                : "''${script:="${pkgs.lib.getExe container}"}"
-                shift
-              ;;
-              *)
-                additional_args+=("$1")
-                shift
-              ;;
-            esac
-          done
-          set -- "''${additional_args[@]}"
-        }
-
-        main() {
-          interpret_args "$@"
-          if [[ -n "''${script:-}" ]]; then
-            "$script" "''${additional_args[@]}"
-          else
-            echo_error "No valid script identified among arguments:" "''${additional_args[@]}"
-            echo
-            echo "See start-help:"
-            ${pkgs.lib.getExe help}
-            exit 1
-          fi
-        }
-
-        main "$@"
-      '';
-    };
+  _name = "${name}-start-${version}";
+  loadEnvText = ''
+    go_to_top_level_directory() {
+      # if git is not installed, return
+      if ! [ -x "$(command -v git)" ]; then
+        return
+      fi
+      # if current directory is not a git directory, return
+      if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        return
+      fi
+      # go to top-level of git directory
+      base_dir="$(git rev-parse --show-toplevel)"
+      cd "$base_dir"
+    }
+    load_env_files() {
+      go_to_top_level_directory
+      # for each file
+      while [[ $# -gt 0 ]]; do
+        # if file isn't readable, continue
+        if [ ! -r "$1" ]; then
+          shift
+          continue
+        fi
+        # load file
+        set -a
+        # shellcheck disable=SC1091 source=/dev/null
+        source "$1"
+        set +a
+        shift
+      done
+    }
+    load_env_files ${pkgs.lib.strings.concatStringsSep " " envFiles}
+  '';
+  webServerDockerContainer = let
+    image = webServer.dockerImage;
+  in pkgs.callPackage ../utils/mk-container.nix {
+    inherit pkgs name version image;
+    podmanArgs = [
+      "--publish" "3000:3000"
+      "--env" "VITE*"
+    ];
+    preStart = ''
+      ${loadEnvText}
+    '';
   };
-in start.main
+  databaseDockerContainer = let
+    image = database.dockerImage;
+  in pkgs.callPackage ../utils/mk-container.nix {
+    inherit pkgs name version image;
+    podmanArgs = [
+      "--publish" "5432:5432"
+      "--env" "POSTGRES*"
+    ];
+    preStart = ''
+      ${loadEnvText}
+      flags=$-
+      if [[ $flags =~ e ]]; then set +e; fi
+      if ! podman volume exists "${image.name}-${image.tag}" > /dev/null 2>&-; then
+        podman volume create "${image.name}-${image.tag}"
+      fi
+      if [[ $flags =~ e ]]; then set -e; fi
+    '';
+  };
+in pkgs.writeShellApplication {
+  name = _name;
+  runtimeEnv = {
+    SCRIPT_NAME = _name;
+    ADDITIONAL_CLI_ARGS = pkgs.lib.strings.concatStringsSep " " cliArgs;
+    START_WEB_SERVER_CONTAINER = pkgs.lib.getExe webServerDockerContainer;
+    START_DATABASE_CONTAINER = pkgs.lib.getExe databaseDockerContainer;
+  };
+  text = builtins.readFile ./start.sh;
+}
