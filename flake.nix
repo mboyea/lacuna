@@ -25,7 +25,7 @@
           inherit name version;
           webServer = submodules.sveltekit.packages;
           database = submodules.postgres.packages;
-          envFiles = [ ".env.development" ]
+          envFiles = [ ".env.development" ];
         };
         default = packages.start;
       };
