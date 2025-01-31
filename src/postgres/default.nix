@@ -5,10 +5,11 @@
   version = "0.0.0";
 in rec {
   packages = {
-    # dev = pkgs.callPackage ./pkgs/dev.nix {
+    # TODO: link to dev package
+    # dev = pkgs.callPackage ./packages/dev.nix {
     #   inherit pkgs name version;
     # };
-    dockerImage = pkgs.callPackage ./pkgs/docker-image.nix {
+    dockerImage = pkgs.callPackage ./packages/docker-image.nix {
       inherit pkgs name version;
     };
     # default = packages.dev;

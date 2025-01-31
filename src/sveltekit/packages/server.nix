@@ -1,7 +1,7 @@
 {
-  pkgs ? import <nixpkgs> {},
-  name ? "test",
-  version ? "0.0.0",
+  pkgs,
+  name,
+  version,
   runtimeShell ? pkgs.runtimeShell
 } : pkgs.buildNpmPackage rec {
   pname = "${name}-server";
