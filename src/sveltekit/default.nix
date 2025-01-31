@@ -6,16 +6,16 @@
   version = nodePackage.version;
 in rec {
   packages = {
-    dev = pkgs.callPackage ./scripts/dev.nix {
+    dev = pkgs.callPackage ./pkgs/dev.nix {
       inherit pkgs name version;
     };
-    preview = pkgs.callPackage ./scripts/preview.nix {
+    preview = pkgs.callPackage ./pkgs/preview.nix {
       inherit pkgs name version;
     };
-    server = pkgs.callPackage ./scripts/server.nix {
+    server = pkgs.callPackage ./pkgs/server.nix {
       inherit pkgs name version;
     };
-    dockerImage = pkgs.callPackage ./scripts/docker-image.nix {
+    dockerImage = pkgs.callPackage ./pkgs/docker-image.nix {
       inherit pkgs name version;
       server = packages.server;
     };
