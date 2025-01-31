@@ -8,11 +8,9 @@
   inherit version;
   src = ../.;
   # Generate a new hash using:
-  #   nix develop
-  #   cd path/to/sveltekit
-  #   npm i --package-lock-only
-  #   prefetch-npm-deps package-lock.json
-  npmDepsHash = "sha256-ThHvyW0noBgoihIZIEzOfmUap4TGv/wj/S9wqJJ8aTA=";
+  #   nix-shell -p prefetch-npm-deps
+  #   prefetch-npm-deps path/to/sveltekit/package-lock.json
+  npmDepsHash = "sha256-XwHQc8NkoiWmCW4g7bBis+m1lC7IunRyzoKFe+SrLfQ=";
   npmBuildScript = "build";
   installPhase = ''
     mkdir -p $out/bin $out/lib
