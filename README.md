@@ -125,7 +125,7 @@ Altogether, this significantly speeds up the feedback loop between development a
 - Deploy docker images to a target hosting provider.
 
 Lacuna scripts are declared as a function of submodules in `flake.nix`.
-Each script function is defined within the `scripts/` directory, and each submodule is defined by `default.nix` in its own subdirectory.
+Each script is defined within the `scripts/` directory, and each submodule is defined by `default.nix` in its own subdirectory.
 
 When this project is more mature and commercially supported, complete documentation will be provided in `docs/`.
 Until then, please first do your best to read the code and understand it, starting at the entrypoint of the program in `flake.nix`.
