@@ -97,6 +97,7 @@ script_start_dev() {
   }
   trap kill_processes EXIT
   # start background processes
+  # TODO use $START_DEV_DATABASE
   "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
   # until the database is accessible at port 5432
   until netcat -z "localhost" "5432" > /dev/null 2>&1; do
@@ -114,9 +115,40 @@ script_start_dev() {
 
 # run each server in a docker container, as similar to its production environment as possible
 script_start_prod() {
-  # $START_CONTAINER_DATABASE
-  # $START_CONTAINER_WEB_SERVER
-  :
+  process_ids=()
+  # kill each process in process_ids
+  # shellcheck disable=SC2317
+  kill_processes() {
+    # send kill signal to each process
+    for process_id in "${process_ids[@]}"; do
+      kill "$process_id" > /dev/null 2>&1
+    done
+    # wait for each process to exit
+    for process_id in "${process_ids[@]}"; do
+      wait "$process_id" 2>/dev/null
+    done
+  }
+  # echo input with a given label
+  echo_label() {
+    while read -r l; do
+      echo "$1 | $l"
+    done
+  }
+  trap kill_processes EXIT
+  # start background processes
+  "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
+  # until the database is accessible at port 5432
+  until netcat -z "localhost" "5432" > /dev/null 2>&1; do
+    # check that the process still exists
+    if ! ps -p "${process_ids[0]}" > /dev/null; then
+      echo_error "The database failed to start"
+      exit 1
+    fi
+    # wait 100ms
+    sleep 0.1
+  done
+  # start main process
+  "$START_CONTAINER_WEB_SERVER" | echo_label "WEBSERVER"
 }
 
 # get the script to run from arguments passed to this function
