@@ -3,7 +3,7 @@ echo_error() {
   echo "Error in $SCRIPT_NAME:" "$@" 1>&2;
 }
 
-# echo input with a given label
+# print input with a given label
 echo_label() {
   while read -r l; do
     echo "$1 | $l"

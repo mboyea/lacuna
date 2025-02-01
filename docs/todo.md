@@ -23,7 +23,7 @@ default_: report
 - [ ] (A) Draft sveltekit /api/v1/pages
 - [ ] (A) Draft sveltekit PageRequests.ts (credit https://github.com/michael/editable-website)
 - [ ] (A) Draft sveltekit psql
-- [ ] (A) Refactor @code @docs
+- [x] (A) 2025-02-01 Refactor @code @docs
 - [x] (A) 2024-12-16 Draft `TODO.md` for +1.0.0 @docs
 - [x] (A) 2024-12-14 Draft `postgres/` packages.serverImage @code
 - [x] (A) 2024-12-03 Draft script `nix run .#start container` @code
