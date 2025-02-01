@@ -76,15 +76,32 @@ script_start_help() {
 
 # run a development version of each server locally with hot-reloading where possible
 script_start_dev() {
-  # $START_DEV_WEB_SERVER "$@"
-  # $START_DEV_DATABASE "$@"
+  "$START_CONTAINER_DATABASE" "$@"
+  # # TODO: start database, wait for startup to be completed, start webserver, then wait for either to exit
+  # process_ids=()
+  # # TODO: test_env
+  # # ? $START_DEV_DATABASE "$@"
+  # #"$START_CONTAINER_DATABASE" "$@" & process_ids+=($!)
+  # # TODO: wait for database to be started
+  # #"$START_DEV_WEB_SERVER" "$@" & process_ids+=($!)
+  # #wait -n
+  # for process_id in "${process_ids[@]}"; do
+  #   if ps -p "$process_id" > /dev/null; then
+  #     kill "$process_id"
+  #   fi
+  # done
+  # for process_id in "${process_ids[@]}"; do
+  #   if ps -p "$process_id" > /dev/null; then
+  #     wait "$process_id"
+  #   fi
+  # done
   :
 }
 
 # run each server in a docker container, as similar to its production environment as possible
 script_start_prod() {
-  # $START_CONTAINER_WEB_SERVER
   # $START_CONTAINER_DATABASE
+  # $START_CONTAINER_WEB_SERVER
   :
 }
 

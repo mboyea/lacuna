@@ -40,7 +40,7 @@ in pkgs.writeShellApplication {
     SCRIPT_NAME = _name;
     ADDITIONAL_CLI_ARGS = pkgs.lib.strings.concatStringsSep " " cliArgs;
     ENV_FILES = pkgs.lib.strings.concatStringsSep " " envFiles;
-    START_DEV_WEB_SERVER = "echo TODO";#pkgs.lib.getExe webServer.dev;
+    START_DEV_WEB_SERVER = pkgs.lib.getExe webServer.dev;
     START_DEV_DATABASE = "echo TODO";#pkgs.lib.getExe database.dev;
     START_CONTAINER_WEB_SERVER = pkgs.lib.getExe webServerDockerContainer;
     START_CONTAINER_DATABASE = pkgs.lib.getExe databaseDockerContainer;
