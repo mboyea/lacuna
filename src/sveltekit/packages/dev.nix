@@ -9,7 +9,7 @@
     pkgs.git
   ];
   text = ''
-    base_dir="$(git rev-parse --show-toplevel)/sveltekit"
+    base_dir="$(git rev-parse --show-toplevel)/src/sveltekit"
     cd "$base_dir"
     npm i
     npm run dev
