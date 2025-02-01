@@ -33,6 +33,7 @@
       fi
       if [[ $flags =~ e ]]; then set -e; fi
     '';
+    useInteractiveTTY = false;
   };
 in pkgs.writeShellApplication {
   name = _name;
