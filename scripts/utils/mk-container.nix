@@ -47,6 +47,7 @@
   name,
   version,
   image,
+  useInteractiveTTY ? true,
   podmanArgs ? [],
   defaultImageArgs ? [],
   # ? https://forums.docker.com/t/solution-required-for-nginx-emerg-bind-to-0-0-0-0-443-failed-13-permission-denied/138875/2
@@ -59,7 +60,9 @@
   runAsRootUser ? false,
   preStart ? "",
   postStop ? "",
-}: pkgs.writeShellApplication {
+}: let
+  _podmanArgs = podmanArgs ++ pkgs.lib.lists.optionals useInteractiveTTY [ "--tty" "--interactive" ];
+in pkgs.writeShellApplication {
   name = "${name}-${image.name}-mk-container-${version}";
   runtimeInputs = [
     pkgs.podman
@@ -78,30 +81,35 @@
       fi
     fi
 
+    # run pre start functions
     ${preStart}
 
-    # cleanup when this script exits
+    # run post stop functions when this script exits
     on_exit() {
       ${postStop}
       :
     }
     trap on_exit EXIT
 
+    # echo a command before executing it
     echo_exec() {
       ( set -x; "$@" )
     }
 
+    # load the image into podman
     echo_exec ${image.stream} | echo_exec podman image load
 
-    echo_exec podman container run --tty --interactive \
-      ${pkgs.lib.strings.concatStringsSep " " podmanArgs} \
+    # declare the image arguments
+    if [ "$#" -gt 0 ]; then
+      image_args=("$@")
+    else
+      image_args=(${pkgs.lib.strings.concatStringsSep " " defaultImageArgs})
+    fi
+
+    # run the image using podman
+    echo_exec podman container run \
+      ${pkgs.lib.strings.concatStringsSep " " _podmanArgs} \
       localhost/${image.name}:${image.tag} \
-      "$( \
-        if [ "$#" -eq 0 ]; then \
-          echo ${pkgs.lib.strings.concatStringsSep " " defaultImageArgs}; \
-        else \
-          echo "$@"; \
-        fi \
-      )"
+      "''${image_args[@]}"
   '';
 }
