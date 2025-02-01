@@ -97,8 +97,7 @@ script_start_help() {
 
 script_start_dev() {
   # start background processes
-  # TODO use $START_DEV_DATABASE
-  "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
+  "$START_DEV_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
   database_process_id="${process_ids[-1]}"
   # until the database is accessible at port 5432
   until netcat -z "localhost" "5432" > /dev/null 2>&1; do
