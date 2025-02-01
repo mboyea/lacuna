@@ -168,8 +168,8 @@ main() {
   fi
   test_env SCRIPT_NAME ENV_FILES START_DEV_WEB_SERVER START_DEV_DATABASE START_CONTAINER_WEB_SERVER START_CONTAINER_DATABASE
   load_env_files "$ENV_FILES"
-  trap kill_processes EXIT
   interpret_script "$@"
+  trap kill_processes EXIT
   eval "$script ${script_args[*]}"
 }
 
