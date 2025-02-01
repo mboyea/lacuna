@@ -1,7 +1,7 @@
 {
-  pkgs ? import <nixpkgs> {},
-  name ? "test",
-  version ? "0.0.0",
+  pkgs,
+  name,
+  version,
 }: let
   _name = "${name}-docker-image";
   tag = version;
@@ -21,7 +21,6 @@
 in {
   name = _name;
   inherit version tag;
-  # ? for compile-time images, consider switching to: https://github.com/nlewo/nix2container
   stream = pkgs.dockerTools.streamLayeredImage {
     name = _name;
     inherit tag;

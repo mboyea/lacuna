@@ -1,18 +1,16 @@
 {
-  pkgs ? import <nixpkgs> {},
-  name ? "test",
-  version ? "0.0.0",
+  pkgs,
+  name,
+  version,
   runtimeShell ? pkgs.runtimeShell
 } : pkgs.buildNpmPackage rec {
   pname = "${name}-server";
   inherit version;
   src = ../.;
   # Generate a new hash using:
-  #   nix develop
-  #   cd path/to/sveltekit
-  #   npm i --package-lock-only
-  #   prefetch-npm-deps package-lock.json
-  npmDepsHash = "sha256-ThHvyW0noBgoihIZIEzOfmUap4TGv/wj/S9wqJJ8aTA=";
+  #   nix-shell -p prefetch-npm-deps
+  #   prefetch-npm-deps path/to/sveltekit/package-lock.json
+  npmDepsHash = "sha256-c2LJSHc3J+/WDxnSaBbbMEIu2VhWlwYYSSN7Rwy5MSM=";
   npmBuildScript = "build";
   installPhase = ''
     mkdir -p $out/bin $out/lib

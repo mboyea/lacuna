@@ -32,15 +32,17 @@ Now you're ready to run the project scripts!
 
 Scripts can be run from within any of the project directories.
 
-Use `nix run .#[SCRIPT] help` for more information about a script.
-
 | Command | Description |
 |:--- |:--- |
 | `nix run` | Alias for `nix run .#start dev` |
-| `nix run .#help` | Print this helpful information |
-| `nix run .#start` | Start the app locally |
-| `nix run .#deploy` | Deploy the app |
-| `nix run .#init` | Initialize the app for deployment |
+| `nix run .#[SCRIPT] ...` | Run a script |
+| `nix run .#[SCRIPT] help` | Print usage information about a script |
+| `nix develop` | Start a dev shell with project tools installed |
+
+| SCRIPT | Description |
+|:--- |:--- |
+| `help` | Print this helpful information |
+| `start` | Start the app locally |
 
 Lacuna scripts are declared in `flake.nix`, and defined in `scripts/`.
 
@@ -126,9 +128,9 @@ Altogether, this significantly speeds up the feedback loop between development a
 - Deploy docker images to a target hosting provider.
 
 Lacuna scripts are declared as a function of submodules in `flake.nix`.
-Each script function is defined within the `scripts/` directory, and each submodule is defined by `default.nix` in its own subdirectory.
+Each script is defined within the `scripts/` directory, and each submodule is defined by `default.nix` in its own subdirectory.
 
-When this project is more mature and commercially supported, complete documentation will be provided in `docs/`.
+When this project is mature and commercially supported, complete documentation will be provided in `docs/`.
 Until then, please first do your best to read the code and understand it, starting at the entrypoint of the program in `flake.nix`.
 If you have any questions, please post a GitHub Issue.
 

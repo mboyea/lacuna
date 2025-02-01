@@ -1,18 +1,18 @@
 {
-  pkgs ? import <nixpkgs> {},
-  name ? "test",
-  version ? "0.0.0",
+  pkgs,
+  name,
+  version,
 }: pkgs.writeShellApplication {
-  name = "${name}-dev-${version}";
+  name = "${name}-preview-${version}";
   runtimeInputs = [
     pkgs.nodejs
-    pkgs.pnpm
     pkgs.git
   ];
   text = ''
     base_dir="$(git rev-parse --show-toplevel)/sveltekit"
     cd "$base_dir"
-    pnpm i
-    pnpm run dev
+    npm i
+    npm run build
+    npm run preview
   '';
 }

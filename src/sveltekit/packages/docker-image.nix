@@ -1,7 +1,7 @@
 {
-  pkgs ? import <nixpkgs> {},
-  name ? "test",
-  version ? "0.0.0",
+  pkgs,
+  name,
+  version,
   server ? pkgs.callPackage ./server.nix { inherit name version; }
 }: let
   _name = "${name}-docker-image";

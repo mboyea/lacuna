@@ -1,8 +1,6 @@
 {
   description = "Lacuna CMS CLI.";
   inputs = {
-    # get new revision # using:           git ls-remote https://github.com/<repo_path> | grep HEAD
-    # pin dependency to revision # like:  url = "github:numtide/flake-utils?rev=#"
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
@@ -12,56 +10,56 @@
     utils = flake-utils;
   in utils.lib.eachDefaultSystem (
     system: let
+      # import pkgs from inputs.nixpkgs
       pkgs = import nixpkgs { inherit system; };
-      # ? TODO use some map function to generate the code for the list of directories
-      sveltekit = import ./sveltekit { inherit pkgs; };
-      postgres = import ./postgres { inherit pkgs; };
-      # keycloak = import ./keycloak { inherit pkgs; };
-      # umami = import ./umami { inherit pkgs; };
+      # import submodules from src/
+      submodules = pkgs.lib.attrsets.mapAttrs
+        (n: v: import (./. + "/src/${n}") { inherit pkgs; })
+        (builtins.readDir ./src);
     in rec {
       packages = {
         help = pkgs.callPackage ./scripts/help.nix {
           inherit name version;
         };
-        # init
-        # deploy
         start = pkgs.callPackage ./scripts/start.nix {
           inherit name version;
-          webServer = sveltekit.packages;
-          database = postgres.packages;
-          # authServer = keycloak.packages;
-          # trackingServer = umami.packages;
+          webServer = submodules.sveltekit.packages;
+          database = submodules.postgres.packages;
+          envFiles = [ ".env.development" ];
         };
         default = packages.start;
       };
       apps = {
         help = utils.lib.mkApp { drv = packages.help; };
-        # init
-        # deploy
         start = utils.lib.mkApp { drv = packages.start; };
-        default = utils.lib.mkApp { drv = packages.start.override { cliArgs = [ "dev" ]; }; };
+        default = utils.lib.mkApp {
+          drv = packages.start.override { cliArgs = [ "dev" ]; };
+        };
       };
-      devShells = {
-        sveltekit = sveltekit.devShells.default;
-        postgres = postgres.devShells.default;
-        # keycloak = keycloak.devShells.default;
-        # umami = umami.devShells.default;
+      # the default devShell for each submodule is provided
+      devShells = (pkgs.lib.attrsets.mapAttrs
+        (n: v: v.devShells.default)
+        submodules
+      ) // {
+        # the root devshell provides packages used in scripts/
         root = pkgs.mkShell {
           packages = [
+            # kill program at PORT using: fuser -k PORT/tcp
+            pkgs.psmisc
+            # get sha256 for dockerTools.pullImage using:
+            # nix-prefetch-docker --quiet --image-name _ --image-tag _ --image-digest sha256:_
+            pkgs.nix-prefetch-docker
+            # run docker containers without starting a daemon
             pkgs.podman
-            pkgs.psmisc # kill program at PORT using: fuser -k PORT/tcp
-            pkgs.gzip
-            pkgs.skopeo
           ];
         };
+        # the default devShell is a combination of every devShell
         default = pkgs.mkShell {
-          inputsFrom = [
-            devShells.root
-            devShells.sveltekit
-            devShells.postgres
-            # devShells.keycloak
-            # devShells.umami
-          ];
+          inputsFrom = (
+            pkgs.lib.attrsets.mapAttrsToList
+            (n: v: devShells."${n}")
+            submodules
+          ) ++ [ devShells.root ];
         };
       };
     }

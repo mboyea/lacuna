@@ -3,6 +3,6 @@
 }: pkgs.mkShell {
   packages = [
     pkgs.postgresql
-    pkgs.nix-prefetch-docker  # see docker-image.nix
+    pkgs.nix-prefetch-docker  # see pkgs/docker-image.nix
   ];
 }
