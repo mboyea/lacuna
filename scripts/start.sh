@@ -80,7 +80,7 @@ kill_processes() {
   done
 }
 
-# print usage instructions for this function
+# script to print usage instructions for the start scripts
 script_start_help() {
   echo "Start the app locally."
   echo
@@ -90,46 +90,71 @@ script_start_help() {
   echo
   echo "SCRIPTS:"
   echo "  help --help -h | Print this helpful information"
-  echo "  dev            | Run each server using devtools"
-  echo "  prod           | Run each server in a container, as similar to the production server as possible"
+  echo "  dev            | Start each server using devtools"
+  echo "  prod           | Start each server in a container, as similar to the production server as possible"
   echo
 }
 
+# script to start each server using devtools
 script_start_dev() {
-  # start background processes
-  "$START_DEV_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
+  flags=$-
+  # check database env
+  test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
+  # start database process
+  database_log_file="$(mktemp)"
+  "$START_DEV_DATABASE" 2>&1 | tee "$database_log_file" | echo_label "DAT" & process_ids+=($!)
   database_process_id="${process_ids[-1]}"
-  # until the database is accessible at port 5432
-  until netcat -z "localhost" "5432" > /dev/null 2>&1; do
-    # check that the process still exists
+  # wait for the database to initialize and be ready to accept connections
+  until \
+    grep -q "PostgreSQL init process complete; ready for start up" "$database_log_file" \
+    && grep -q "\[1\] .* database system is ready to accept connections" "$database_log_file"
+  do
     if ! ps -p "$database_process_id" > /dev/null; then
       echo_error "The database failed to start"
       exit 1
     fi
-    # wait 100ms
     sleep 0.1
   done
-  # start main process
-  "$START_DEV_WEB_SERVER" | echo_label "WEBSERVER"
+  # check that the database is accessible at port 5432
+  if ! netstat -tulpn 2>&1 | grep ":5432 " > /dev/null 2>&1; then
+    echo_error "The database did not bind to port 5432"
+    exit 1
+  fi
+
+  # check web server env
+  test_env POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
+  if [[ $flags =~ e ]]; then set +e; fi # disable exit on error
+  vite_env=$(env | grep -e "^VITE" -e "^POSTGRES_WEBSERVER_USERNAME" -e "^POSTGRES_WEBSERVER_PASSWORD" | cut -d "=" -f 1)
+  if [[ $flags =~ e ]]; then set -e; fi # re-enable exit on error
+  if [[ -n "${vite_env[*]}" ]]; then
+    for i in "${!vite_env[@]}"; do
+      # TODO: fix this
+      vite_env[i]="${vite_env[i]}=${!vite_env[i]}"
+    done
+  fi
+  # start web server as main process
+  echo "${vite_env[@]}"
+  "$START_DEV_WEB_SERVER" "${vite_env[@]}" 2>&1 | echo_label "WEB"
 }
 
-# run each server in a docker container, as similar to its production environment as possible
+# script to start each server in a container, as similar to the production server as possible
 script_start_prod() {
-  # start background processes
-  "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
-  database_process_id="${process_ids[-1]}"
-  # until the database is accessible at port 5432
-  until netcat -z "localhost" "5432" > /dev/null 2>&1; do
-    # check that the process still exists
-    if ! ps -p "$database_process_id" > /dev/null; then
-      echo_error "The database failed to start"
-      exit 1
-    fi
-    # wait 100ms
-    sleep 0.1
-  done
-  # start main process
-  "$START_CONTAINER_WEB_SERVER" | echo_label "WEBSERVER"
+  # # start background processes
+  # "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
+  # database_process_id="${process_ids[-1]}"
+  # # until the database is accessible at port 5432
+  # until netcat -z "localhost" "5432" > /dev/null 2>&1; do
+  #   # check that the process still exists
+  #   if ! ps -p "$database_process_id" > /dev/null; then
+  #     echo_error "The database failed to start"
+  #     exit 1
+  #   fi
+  #   # wait 100ms
+  #   sleep 0.1
+  # done
+  # # start main process
+  # "$START_CONTAINER_WEB_SERVER" | echo_label "WEBSERVER"
+  :
 }
 
 # get the script to run from arguments passed to this function

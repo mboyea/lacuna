@@ -8,15 +8,13 @@
   # update base image using variables from:
   #   xdg-open https://hub.docker.com/_/postgres/tags
   #   nix-shell -p nix-prefetch-docker
-  #   nix-prefetch-docker --quiet --image-name postgres --image-tag 13.18 --image-digest sha256:13ae5ab08d8400b3002da7495978381b83ad094c24f54d7cd7ddebefc5ac9e64
+  #   nix-prefetch-docker --quiet --image-name postgres --image-tag _ --image-digest _
   baseImage = pkgs.dockerTools.pullImage {
     imageName = "postgres";
-    imageDigest ="sha256:13ae5ab08d8400b3002da7495978381b83ad094c24f54d7cd7ddebefc5ac9e64";
+    imageDigest = "sha256:68bb947ec37e6cfd5486c51ecdd122babc3ddaedb490acb913130a7e325d36c5";
+    sha256 = "082f0q16gfark1yrh8ms7a10wpjqx9x1zpzvskr0bw1jnv249jia";
     finalImageName = "postgres";
-    finalImageTag = "13.18";
-    sha256 = "07lhm870cd5rd7zl95h0imlr6imkgffjwh88pv6lsz3yz09yqcgv";
-    os = "linux";
-    arch = "amd64";
+    finalImageTag = "15";
   };
 in {
   name = _name;
@@ -29,7 +27,7 @@ in {
     fakeRootCommands = ''
       mkdir -p /docker-entrypoint-initdb.d
 
-      cat > /docker-entrypoint-initdb.d/init.sql <<- EOF
+      cat > /docker-entrypoint-initdb.d/init.sql << 'EOF'
         -- CREATE DATABASE IF NOT EXISTS lacuna
         SELECT 'CREATE DATABASE lacuna'
         WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lacuna')\gexec
@@ -37,12 +35,17 @@ in {
         -- USE lacuna
         \c lacuna
 
+        -- CREATE USER IF NOT EXISTS $POSTGRES_WEBSERVER_USERNAME WITH PASSWORD $POSTGRES_WEBSERVER_PASSWORD
+        \getenv webserver_password POSTGRES_WEBSERVER_PASSWORD
+        \getenv webserver_username POSTGRES_WEBSERVER_USERNAME
+        \set do 'BEGIN\n  CREATE USER ' :webserver_username ' WITH PASSWORD ' :'webserver_password' ';  EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '''%, skipping''', SQLERRM USING ERRCODE = SQLSTATE;\nEND'
+        DO :'do';
+        \unset do
+
         ${builtins.readFile ../schema/init-db.psql}
       EOF
     '';
     config = {
-      # Env = [ "POSTGRES_PASSWORD=temp" ];
-      # ? podman exec --tty --interactive --latest psql -U postgres lacuna
       Cmd = [ "postgres" ];
       Entrypoint = [ "docker-entrypoint.sh" ];
       ExposedPorts = {

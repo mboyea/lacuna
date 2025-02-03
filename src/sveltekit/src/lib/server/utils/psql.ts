@@ -1,10 +1,10 @@
-import { PG_URL } from "$env/static/private";
+import { POSTGRES_WEBSERVER_USERNAME, POSTGRES_WEBSERVER_PASSWORD } from "$env/static/private";
 import pg from "pg";
 const { Pool } = pg;
 
 const createPool = () => {
 	console.log(`Establishing database connection.`);
-	const pool = new Pool({ connectionString: PG_URL });
+	const pool = new Pool({ connectionString: `postgres://${POSTGRES_WEBSERVER_USERNAME}:${POSTGRES_WEBSERVER_PASSWORD}@localhost:5432/lacuna` });
 	return {
 		query: (queryTextOrConfig: string | pg.QueryConfig<any[]>, values?: any[] | undefined) => {
 			return pool.query(queryTextOrConfig, values);
