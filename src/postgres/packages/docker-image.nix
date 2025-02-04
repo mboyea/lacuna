@@ -51,6 +51,9 @@ in {
       ExposedPorts = {
         "5432/tcp" = {};
       };
+      Volumes = {
+        "/var/lib/postgresql/data" = {};
+      };
     };
   };
   

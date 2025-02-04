@@ -1,10 +1,10 @@
-import { POSTGRES_WEBSERVER_USERNAME, POSTGRES_WEBSERVER_PASSWORD } from "$env/static/private";
+import { env } from "$env/dynamic/private";
 import pg from "pg";
 const { Pool } = pg;
 
 const createPool = () => {
 	console.log(`Establishing database connection.`);
-	const pool = new Pool({ connectionString: `postgres://${POSTGRES_WEBSERVER_USERNAME}:${POSTGRES_WEBSERVER_PASSWORD}@localhost:5432/lacuna` });
+	const pool = new Pool({ connectionString: `postgres://${env.POSTGRES_WEBSERVER_USERNAME}:${env.POSTGRES_WEBSERVER_PASSWORD}@${env.POSTGRES_NETLOC}:${env.POSTGRES_PORT}/lacuna` });
 	return {
 		query: (queryTextOrConfig: string | pg.QueryConfig<any[]>, values?: any[] | undefined) => {
 			return pool.query(queryTextOrConfig, values);
@@ -14,11 +14,11 @@ const createPool = () => {
 			try {
 				const response = await pool.query(
 					'SELECT $1::text as message',
-					['Test successful.']
+					['Database test successful.']
 				);
 				console.log(response.rows[0].message);
 			} catch(e) {
-				console.error(`Test failed: ${e}`);
+				console.error(`Database test failed: ${e}`);
 			}
 		},
 	};

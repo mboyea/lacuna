@@ -106,8 +106,7 @@ script_start_dev() {
   database_process_id="${process_ids[-1]}"
   # wait for the database to initialize and be ready to accept connections
   until \
-    grep -q "PostgreSQL init process complete; ready for start up" "$database_log_file" \
-    && grep -q "\[1\] .* database system is ready to accept connections" "$database_log_file"
+    grep -q "^.*\[1\].*database system is ready to accept connections" "$database_log_file"
   do
     if ! ps -p "$database_process_id" > /dev/null; then
       echo_error "The database failed to start"
@@ -120,21 +119,22 @@ script_start_dev() {
     echo_error "The database did not bind to port 5432"
     exit 1
   fi
-
-  # check web server env
+  # check webserver env
   test_env POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
-  if [[ $flags =~ e ]]; then set +e; fi # disable exit on error
-  vite_env=$(env | grep -e "^VITE" -e "^POSTGRES_WEBSERVER_USERNAME" -e "^POSTGRES_WEBSERVER_PASSWORD" | cut -d "=" -f 1)
-  if [[ $flags =~ e ]]; then set -e; fi # re-enable exit on error
-  if [[ -n "${vite_env[*]}" ]]; then
-    for i in "${!vite_env[@]}"; do
-      # TODO: fix this
-      vite_env[i]="${vite_env[i]}=${!vite_env[i]}"
-    done
-  fi
-  # start web server as main process
-  echo "${vite_env[@]}"
-  "$START_DEV_WEB_SERVER" "${vite_env[@]}" 2>&1 | echo_label "WEB"
+  : "${POSTGRES_NETLOC:="localhost"}"
+  : "${POSTGRES_PORT:="5432"}"
+  # get webserver env
+  webserver_env=(
+    POSTGRES_WEBSERVER_USERNAME
+    POSTGRES_WEBSERVER_PASSWORD
+    POSTGRES_NETLOC
+    POSTGRES_PORT
+  )
+  for i in "${!webserver_env[@]}"; do
+    webserver_env[i]="${webserver_env[i]}=${!webserver_env[i]}"
+  done
+  # start webserver as main process
+  env "${webserver_env[@]}" "$START_DEV_WEBSERVER" 2>&1 | echo_label "WEB"
 }
 
 # script to start each server in a container, as similar to the production server as possible
@@ -153,7 +153,7 @@ script_start_prod() {
   #   sleep 0.1
   # done
   # # start main process
-  # "$START_CONTAINER_WEB_SERVER" | echo_label "WEBSERVER"
+  # "$START_CONTAINER_WEBSERVER" | echo_label "WEBSERVER"
   :
 }
 
@@ -190,7 +190,7 @@ main() {
   if [[ -n "${ADDITIONAL_CLI_ARGS// /}" ]]; then
     set -- "$@" "$ADDITIONAL_CLI_ARGS"
   fi
-  test_env SCRIPT_NAME ENV_FILES START_DEV_WEB_SERVER START_DEV_DATABASE START_CONTAINER_WEB_SERVER START_CONTAINER_DATABASE
+  test_env SCRIPT_NAME ENV_FILES START_DEV_WEBSERVER START_DEV_DATABASE START_CONTAINER_WEBSERVER START_CONTAINER_DATABASE
   load_env_files "$ENV_FILES"
   interpret_script "$@"
   trap kill_processes EXIT
