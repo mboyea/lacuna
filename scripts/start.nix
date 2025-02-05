@@ -13,9 +13,14 @@
   in pkgs.callPackage utils/mk-container.nix {
     inherit pkgs name version image;
     podmanArgs = [
-      "--publish" "3000:3000"
-      "--env" "VITE*"
+      # "--publish" "3000:3000"
+      "--network=host"
+      "--env" "POSTGRES_WEBSERVER_USERNAME"
+      "--env" "POSTGRES_WEBSERVER_PASSWORD"
+      "--env" "POSTGRES_NETLOC"
+      "--env" "POSTGRES_PORT"
     ];
+    useInteractiveTTY = true;
   };
   databaseDockerContainer = let
     image = database.dockerImage;
@@ -31,7 +36,7 @@
       if [[ $flags =~ e ]]; then set +e; fi
       # if volume doesn't exist, create one
       if ! podman volume exists "${image.name}-${image.tag}" > /dev/null 2>&-; then
-        podman volume create "${image.name}-${image.tag}"
+        podman volume create "${image.name}-${image.tag}" > /dev/null 2>&1
         echo "New volume created at ${image.name}-${image.tag}"
       # else volume exists; if schema modified, backup old volume and make a new one
       elif git status --porcelain | grep -q "src/postgres/schema/"; then

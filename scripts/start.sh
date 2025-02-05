@@ -97,7 +97,6 @@ script_start_help() {
 
 # script to start each server using devtools
 script_start_dev() {
-  flags=$-
   # check database env
   test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
   # start database process
@@ -139,6 +138,43 @@ script_start_dev() {
 
 # script to start each server in a container, as similar to the production server as possible
 script_start_prod() {
+  # check database env
+  test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
+  # start database process
+  database_log_file="$(mktemp)"
+  "$START_CONTAINER_DATABASE" 2>&1 | tee "$database_log_file" | echo_label "DAT" & process_ids+=($!)
+  database_process_id="${process_ids[-1]}"
+  # wait for the database to initialize and be ready to accept connections
+  until \
+    grep -q "^.*\[1\].*database system is ready to accept connections" "$database_log_file"
+  do
+    if ! ps -p "$database_process_id" > /dev/null; then
+      echo_error "The database failed to start"
+      exit 1
+    fi
+    sleep 0.1
+  done
+  # check that the database is accessible at port 5432
+  if ! netstat -tulpn 2>&1 | grep ":5432 " > /dev/null 2>&1; then
+    echo_error "The database did not bind to port 5432"
+    exit 1
+  fi
+  # check webserver env
+  test_env POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
+  : "${POSTGRES_NETLOC:="localhost"}"
+  : "${POSTGRES_PORT:="5432"}"
+  # get webserver env
+  webserver_env=(
+    POSTGRES_WEBSERVER_USERNAME
+    POSTGRES_WEBSERVER_PASSWORD
+    POSTGRES_NETLOC
+    POSTGRES_PORT
+  )
+  for i in "${!webserver_env[@]}"; do
+    webserver_env[i]="${webserver_env[i]}=${!webserver_env[i]}"
+  done
+  # start webserver as main process
+  env "${webserver_env[@]}" "$START_CONTAINER_WEBSERVER" 2>&1 | echo_label "WEB"
   # # start background processes
   # "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
   # database_process_id="${process_ids[-1]}"
