@@ -19,8 +19,8 @@ default_: report
 - [ ] (D) credit https://github.com/michael/editable-website for svelte tech
 - [ ] (C) Draft Github Actions to deploy `docs/` to GitHub pages @code @docs
 - [ ] (C) Write documentation in `docs/` @docs
-- [ ] (B) Draft `src/umami/`
-- [ ] (B) Draft deploy instructions in `README.md`
+- [ ] (B) Draft `src/umami/` @code
+- [ ] (B) Draft deploy instructions in `README.md` @docs
 - [ ] (B) Draft script `nix run .#deploy` @code
 - [ ] (A) Draft content editor @code
 - [ ] (A) Draft `/admin/login` @code
