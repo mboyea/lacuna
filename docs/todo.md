@@ -16,12 +16,12 @@ default_: report
 
 - [ ] (C) Fork to www-lacuna-com
 - [ ] (A) Announce release for +1.0.0 @docs
+- [ ] (D) credit https://github.com/michael/editable-website for svelte tech
 - [ ] (C) Write documentation in `docs/` @docs
 - [ ] (C) Draft Github Actions build pipeline to deploy `docs/` to GitHub pages @code @docs
 - [ ] (B) Draft script `nix run .#deploy`
 - [ ] (A) Draft sveltekit pages content editor
-- [ ] (A) Draft sveltekit /api/v1/pages
-- [ ] (A) Draft sveltekit PageRequests.ts (credit https://github.com/michael/editable-website)
+- [x] (A) 2025-02-06 Draft GET `/api/v1/content`
 - [x] (A) 2025-02-04 Draft script `nix run .#start prod` @code
 - [x] (A) 2025-02-04 Draft sveltekit psql
 - [x] (A) 2025-02-01 Refactor @code @docs
