@@ -12,3 +12,11 @@ export const GET: ServerLoad = async ({ params }) => {
   }
   return json(result, { status: 200 })
 }
+
+// TODO: POST
+
+// TODO: PUT
+
+// TODO: PATCH
+
+// TODO: DELETE

@@ -17,19 +17,23 @@ default_: report
 - [ ] (C) Fork to www-lacuna-com
 - [ ] (A) Announce release for +1.0.0 @docs
 - [ ] (D) credit https://github.com/michael/editable-website for svelte tech
+- [ ] (C) Draft Github Actions to deploy `docs/` to GitHub pages @code @docs
 - [ ] (C) Write documentation in `docs/` @docs
-- [ ] (C) Draft Github Actions build pipeline to deploy `docs/` to GitHub pages @code @docs
-- [ ] (B) Draft script `nix run .#deploy`
-- [ ] (A) Draft sveltekit pages content editor
-- [x] (A) 2025-02-06 Draft GET `/api/v1/content`
+- [ ] (B) Draft `src/umami/`
+- [ ] (B) Draft deploy instructions in `README.md`
+- [ ] (B) Draft script `nix run .#deploy` @code
+- [ ] (A) Draft content editor @code
+- [ ] (A) Draft `/admin/login` @code
+- [ ] (A) Draft `src/keycloak/` @code
+- [x] (A) 2025-02-06 Draft sveltekit GET `/api/v1/content` @code
 - [x] (A) 2025-02-04 Draft script `nix run .#start prod` @code
 - [x] (A) 2025-02-04 Draft sveltekit psql
 - [x] (A) 2025-02-01 Refactor @code @docs
-- [x] (A) 2024-12-16 Draft `TODO.md` for +1.0.0 @docs
-- [x] (A) 2024-12-14 Draft `postgres/` packages.serverImage @code
+- [x] (A) 2024-12-16 Draft `docs/todo.md` for +1.0.0 @docs
+- [x] (A) 2024-12-14 Draft `src/postgres/` packages.serverImage @code
 - [x] (A) 2024-12-03 Draft script `nix run .#start container` @code
-- [x] (A) 2024-12-03 Draft `sveltekit/` packages.serverImage @code
-- [x] (A) 2024-12-02 Draft `sveltekit/` packages.server @code
+- [x] (A) 2024-12-03 Draft `src/sveltekit/` packages.serverImage @code
+- [x] (A) 2024-12-02 Draft `src/sveltekit/` packages.server @code
 - [x] (A) 2024-11-20 Draft script `nix run .#start dev` & `nix run .#start preview` @code
 - [x] (A) 2024-11-18 Draft script `nix run .#help` @code @docs
 - [x] (A) 2024-11-16 Draft initial Nix code @code
