@@ -3,6 +3,7 @@
   name,
   version,
   webServer,
+  authServer,
   database,
   envFiles ? [],
   cliArgs ? [],
@@ -20,7 +21,23 @@
       "--env" "POSTGRES_NETLOC"
       "--env" "POSTGRES_PORT"
     ];
-    useInteractiveTTY = true;
+    ensureStopOnExit = true;
+    useInteractiveTTY = false;
+  };
+  authServerDockerContainer = let
+    image = authServer.dockerImage;
+  in pkgs.callPackage utils/mk-container.nix {
+    inherit pkgs name version image;
+    podmanArgs = [
+      "--publish" "8080"
+      "--publish" "8443"
+      "--env" "KC*"
+    ];
+    defaultImageArgs = [
+      "start-dev"
+    ];
+    ensureStopOnExit = true;
+    useInteractiveTTY = false;
   };
   databaseDockerContainer = let
     image = database.dockerImage;
@@ -29,7 +46,7 @@
     podmanArgs = [
       "--publish" "5432:5432"
       "--env" "POSTGRES*"
-      "--volume" "${image.name}-${image.tag}:/var/lib/postgresql/data"
+      "--volume" "\"${image.name}-${image.tag}:/var/lib/postgresql/data\""
     ];
     preStart = ''
       flags=$-
@@ -62,6 +79,7 @@
       fi
       if [[ $flags =~ e ]]; then set -e; fi
     '';
+    ensureStopOnExit = true;
     useInteractiveTTY = false;
   };
 in pkgs.writeShellApplication {
@@ -71,9 +89,14 @@ in pkgs.writeShellApplication {
     ADDITIONAL_CLI_ARGS = pkgs.lib.strings.concatStringsSep " " cliArgs;
     ENV_FILES = pkgs.lib.strings.concatStringsSep " " envFiles;
     START_DEV_WEBSERVER = pkgs.lib.getExe webServer.dev;
+    START_DEV_AUTHSERVER = pkgs.lib.getExe authServerDockerContainer;
     START_DEV_DATABASE = pkgs.lib.getExe databaseDockerContainer;
     START_CONTAINER_WEBSERVER = pkgs.lib.getExe webServerDockerContainer;
+    START_CONTAINER_AUTHSERVER = pkgs.lib.getExe authServerDockerContainer;
     START_CONTAINER_DATABASE = pkgs.lib.getExe databaseDockerContainer;
   };
+  runtimeInputs = [
+    pkgs.expect
+  ];
   text = builtins.readFile ./start.sh;
 }

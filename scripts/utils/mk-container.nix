@@ -47,21 +47,28 @@
   name,
   version,
   image,
-  useInteractiveTTY ? true,
   podmanArgs ? [],
   defaultImageArgs ? [],
   # ? https://forums.docker.com/t/solution-required-for-nginx-emerg-bind-to-0-0-0-0-443-failed-13-permission-denied/138875/2
   # ! Linux does not allow an unprivileged user to bind software to a port below 1024.
   # ! It is not a restriction introduced by docker or containers in general.
   # ! People usually use 8080 and 8443 instead, mapping host port 80 to 8080 and host port 443 to 8443.
-  # ! However, in the case you need to use a low port number for expected behavior, the option to run as root is provided here.
+  # ! However, in the case you need to use a low port number for expected behavior, the option to run the container as root is provided here.
   # ! Note that this is insecure when combined with --privileged and a malicious image.
   # ! For improved security, you should use --cap-add NET_BIND_SERVICE rather than --privileged.
   runAsRootUser ? false,
+  # ! Some images don't receive SIGINT correctly.
+  # ! In the case that your image isn't reliably stopped when this script ends, you can enable this option so podman will stop the container.
+  ensureStopOnExit ? false,
+  stopOnExitTimeout ? 1,
+  # ! By default will pass --tty and --interactive to podman because that's the default use case for this utility
+  useInteractiveTTY ? true,
   preStart ? "",
   postStop ? "",
 }: let
-  _podmanArgs = podmanArgs ++ pkgs.lib.lists.optionals useInteractiveTTY [ "--tty" "--interactive" ];
+  _podmanArgs = podmanArgs
+    ++ pkgs.lib.lists.optionals useInteractiveTTY [ "--tty" "--interactive" ]
+    ++ pkgs.lib.lists.optionals ensureStopOnExit [ "--cidfile" "\"$container_id_file\"" ];
 in pkgs.writeShellApplication {
   name = "${name}-${image.name}-mk-container-${version}";
   runtimeInputs = [
@@ -85,9 +92,18 @@ in pkgs.writeShellApplication {
     ${preStart}
 
     # run post stop functions when this script exits
+    container_id_file="$(mktemp)"
     on_exit() {
+      trap ''' INT
+      if "${pkgs.lib.trivial.boolToString ensureStopOnExit}"; then
+        flags=$-
+        if [[ $flags =~ e ]]; then set +e; fi # disable exit on error
+        container_id="$(< "$container_id_file")"
+        podman container stop --time "${builtins.toString stopOnExitTimeout}" "$container_id" > /dev/null
+        if [[ $flags =~ e ]]; then set -e; fi # re-enable exit on error
+      fi
       ${postStop}
-      :
+      trap - INT
     }
     trap on_exit EXIT
 

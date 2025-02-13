@@ -24,6 +24,7 @@
         start = pkgs.callPackage ./scripts/start.nix {
           inherit name version;
           webServer = submodules.sveltekit.packages;
+          authServer = submodules.keycloak.packages;
           database = submodules.postgres.packages;
           envFiles = [ ".env.development" ];
         };

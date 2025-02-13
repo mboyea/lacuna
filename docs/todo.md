@@ -24,7 +24,8 @@ default_: report
 - [ ] (B) Draft script `nix run .#deploy` @code
 - [ ] (A) Draft content editor @code
 - [ ] (A) Draft `/admin/login` @code
-- [ ] (A) Draft `src/keycloak/` @code
+- [ ] (A) Draft keycloak configuration @code
+- [x] (A) 2025-02-12 Draft keycloak server image @code
 - [x] (A) 2025-02-06 Draft sveltekit GET `/api/v1/content` @code
 - [x] (A) 2025-02-04 Draft script `nix run .#start prod` @code
 - [x] (A) 2025-02-04 Draft sveltekit psql

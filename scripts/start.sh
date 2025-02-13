@@ -70,14 +70,17 @@ load_env_files() {
 # kill each process in process_ids
 process_ids=()
 kill_processes() {
+  flags=$-
+  if [[ $flags =~ e ]]; then set +e; fi # disable exit on error
   # send kill signal to each process
   for process_id in "${process_ids[@]}"; do
-    kill "$process_id" > /dev/null 2>&1
+    kill -9 -- "-$process_id" > /dev/null 2>&1
   done
   # wait for each process to exit
   for process_id in "${process_ids[@]}"; do
     wait "$process_id" 2>/dev/null
   done
+  if [[ $flags =~ e ]]; then set -e; fi # re-enable exit on error
 }
 
 # script to print usage instructions for the start scripts
@@ -101,9 +104,9 @@ script_start_dev() {
   test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
   # start database process
   database_log_file="$(mktemp)"
-  "$START_DEV_DATABASE" 2>&1 | tee "$database_log_file" | echo_label "DAT" & process_ids+=($!)
+  (unbuffer "$START_DEV_DATABASE" | tee "$database_log_file" | echo_label "DATA") & process_ids+=($!)
   database_process_id="${process_ids[-1]}"
-  # wait for the database to initialize and be ready to accept connections
+  # wait for the database to be ready to accept connections
   until \
     grep -q "^.*\[1\].*database system is ready to accept connections" "$database_log_file"
   do
@@ -113,11 +116,22 @@ script_start_dev() {
     fi
     sleep 0.1
   done
-  # check that the database is accessible at port 5432
-  if ! netstat -tulpn 2>&1 | grep ":5432 " > /dev/null 2>&1; then
-    echo_error "The database did not bind to port 5432"
-    exit 1
-  fi
+  # check authserver env
+  # get authserver env
+  # start authserver process
+  authserver_log_file="$(mktemp)"
+  (unbuffer "$START_DEV_AUTHSERVER" | tee "$authserver_log_file" | echo_label "AUTH") & process_ids+=($!)
+  authserver_process_id="${process_ids[-1]}"
+  # wait for the authserver to be ready to accept connections
+  until \
+    grep -q "^.*Profile.*activated" "$authserver_log_file"
+  do
+    if ! ps -p "$authserver_process_id" > /dev/null; then
+      echo_error "The authserver failed to start"
+      exit 1
+    fi
+    sleep 0.1
+  done
   # check webserver env
   test_env POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
   : "${POSTGRES_NETLOC:="localhost"}"
@@ -133,7 +147,8 @@ script_start_dev() {
     webserver_env[i]="${webserver_env[i]}=${!webserver_env[i]}"
   done
   # start webserver as main process
-  env "${webserver_env[@]}" "$START_DEV_WEBSERVER" 2>&1 | echo_label "WEB"
+  # env "${webserver_env[@]}" unbuffer "$START_DEV_WEBSERVER" 2>&1 | echo_label "WEBS" # ! echo label doesnt capture every output
+  env "${webserver_env[@]}" "$START_DEV_WEBSERVER"
 }
 
 # script to start each server in a container, as similar to the production server as possible
@@ -142,9 +157,9 @@ script_start_prod() {
   test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
   # start database process
   database_log_file="$(mktemp)"
-  "$START_CONTAINER_DATABASE" 2>&1 | tee "$database_log_file" | echo_label "DAT" & process_ids+=($!)
+  (unbuffer "$START_DEV_DATABASE" | tee "$database_log_file" | echo_label "DATA") & process_ids+=($!)
   database_process_id="${process_ids[-1]}"
-  # wait for the database to initialize and be ready to accept connections
+  # wait for the database to be ready to accept connections
   until \
     grep -q "^.*\[1\].*database system is ready to accept connections" "$database_log_file"
   do
@@ -154,11 +169,22 @@ script_start_prod() {
     fi
     sleep 0.1
   done
-  # check that the database is accessible at port 5432
-  if ! netstat -tulpn 2>&1 | grep ":5432 " > /dev/null 2>&1; then
-    echo_error "The database did not bind to port 5432"
-    exit 1
-  fi
+  # check authserver env
+  # get authserver env
+  # start authserver process
+  authserver_log_file="$(mktemp)"
+  (unbuffer "$START_DEV_AUTHSERVER" 2>&1 | tee "$authserver_log_file" | echo_label "AUTH") & process_ids+=($!)
+  authserver_process_id="${process_ids[-1]}"
+  # wait for the authserver to be ready to accept connections
+  until \
+    grep -q "^.*Profile.*activated" "$authserver_log_file"
+  do
+    if ! ps -p "$authserver_process_id" > /dev/null; then
+      echo_error "The authserver failed to start"
+      exit 1
+    fi
+    sleep 0.1
+  done
   # check webserver env
   test_env POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
   : "${POSTGRES_NETLOC:="localhost"}"
@@ -174,23 +200,7 @@ script_start_prod() {
     webserver_env[i]="${webserver_env[i]}=${!webserver_env[i]}"
   done
   # start webserver as main process
-  env "${webserver_env[@]}" "$START_CONTAINER_WEBSERVER" 2>&1 | echo_label "WEB"
-  # # start background processes
-  # "$START_CONTAINER_DATABASE" 2>&1 | echo_label "DATABASE" & process_ids+=($!)
-  # database_process_id="${process_ids[-1]}"
-  # # until the database is accessible at port 5432
-  # until netcat -z "localhost" "5432" > /dev/null 2>&1; do
-  #   # check that the process still exists
-  #   if ! ps -p "$database_process_id" > /dev/null; then
-  #     echo_error "The database failed to start"
-  #     exit 1
-  #   fi
-  #   # wait 100ms
-  #   sleep 0.1
-  # done
-  # # start main process
-  # "$START_CONTAINER_WEBSERVER" | echo_label "WEBSERVER"
-  :
+  env "${webserver_env[@]}" "$START_CONTAINER_WEBSERVER"
 }
 
 # get the script to run from arguments passed to this function
