@@ -60,7 +60,6 @@
   # ! Some images don't receive SIGINT correctly.
   # ! In the case that your image isn't reliably stopped when this script ends, you can enable this option so podman will stop the container.
   ensureStopOnExit ? false,
-  stopOnExitTimeout ? 1,
   # ! By default will pass --tty and --interactive to podman because that's the default use case for this utility
   useInteractiveTTY ? true,
   preStart ? "",
@@ -99,7 +98,7 @@ in pkgs.writeShellApplication {
         flags=$-
         if [[ $flags =~ e ]]; then set +e; fi # disable exit on error
         container_id="$(< "$container_id_file")"
-        podman container stop --time "${builtins.toString stopOnExitTimeout}" "$container_id" > /dev/null
+        podman container kill "$container_id" > /dev/null 2>&1
         if [[ $flags =~ e ]]; then set -e; fi # re-enable exit on error
       fi
       ${postStop}
