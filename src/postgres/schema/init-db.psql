@@ -7,8 +7,7 @@ CREATE TABLE IF NOT EXISTS editable_content (
   markdown TEXT NOT NULL
 );
 
-COMMIT;
-
+-- -- ? insert a default value
 -- INSERT INTO persons (id, last_name, first_name, address, city, state)
 -- SELECT 1, 'John', 'Doe', '1234 EXAMPLE ROAD', 'Chicago', 'Illinois'
 -- WHERE NOT EXISTS (
@@ -16,3 +15,5 @@ COMMIT;
 --   FROM persons
 --   WHERE id = 1 AND first_name = 'John' AND last_name = 'Doe'
 -- );
+
+COMMIT;

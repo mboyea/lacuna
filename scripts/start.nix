@@ -29,13 +29,30 @@
   in pkgs.callPackage utils/mk-container.nix {
     inherit pkgs name version image;
     podmanArgs = [
-      "--publish" "8080"
-      "--publish" "8443"
+      # "--publish" "8080:8080"
+      # "--publish" "8443:8443"
+      "--network=host"
       "--env" "KC*"
+      "--volume" "\"${image.name}-${image.tag}:/opt/jboss/keycloak/standalone/data\""
     ];
     defaultImageArgs = [
-      "start-dev"
+      # "start"
+
+      # "build"
+      # "start" "--optimized"
+
+      # "start-dev"
     ];
+    preStart = ''
+      flags=$-
+      if [[ $flags =~ e ]]; then set +e; fi
+      # if volume doesn't exist, create one
+      if ! podman volume exists "${image.name}-${image.tag}" > /dev/null 2>&-; then
+        podman volume create "${image.name}-${image.tag}" > /dev/null 2>&1
+        echo "New volume created at ${image.name}-${image.tag}"
+      fi
+      if [[ $flags =~ e ]]; then set -e; fi
+    '';
     ensureStopOnExit = true;
     useInteractiveTTY = false;
   };

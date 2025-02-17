@@ -3,7 +3,7 @@ echo_error() {
   echo "Error in $SCRIPT_NAME:" "$@" 1>&2;
 }
 
-# print input with a given label
+# print input with a given label ($1)
 echo_label() {
   while read -r l; do
     echo "$1 | $l"
@@ -101,8 +101,8 @@ script_start_help() {
 # script to start each server using devtools
 script_start_dev() {
   # check database env
-  test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD
-  # start database process
+  test_env POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD POSTGRES_AUTHSERVER_USERNAME POSTGRES_AUTHSERVER_PASSWORD
+  # start database as background process
   database_log_file="$(mktemp)"
   (unbuffer "$START_DEV_DATABASE" | tee "$database_log_file" | echo_label "DATA") & process_ids+=($!)
   database_process_id="${process_ids[-1]}"
@@ -117,10 +117,36 @@ script_start_dev() {
     sleep 0.1
   done
   # check authserver env
+  test_env POSTGRES_AUTHSERVER_USERNAME POSTGRES_AUTHSERVER_PASSWORD
+  : "${KC_DB:="postgres"}"
+  : "${KC_DB_DATABASE:="lacuna"}"
+  : "${KC_DB_USERNAME:="$POSTGRES_AUTHSERVER_USERNAME"}"
+  : "${KC_DB_PASSWORD:="$POSTGRES_AUTHSERVER_PASSWORD"}"
+  : "${KC_DB_URL_DATABASE:="$KC_DB_DATABASE"}"
+  : "${KC_DB_URL_HOST:="localhost"}"
+  : "${KC_DB_URL_PORT:="5432"}"
+  : "${KC_HEALTH_ENABLED:="true"}"
+  : "${KC_METRICS_ENABLED:="true"}"
   # get authserver env
-  # start authserver process
+  authserver_env=(
+    KC_DB
+    KC_DB_DATABASE
+    KC_DB_USERNAME
+    KC_DB_PASSWORD
+    KC_DB_URL_DATABASE
+    KC_DB_URL_HOST
+    KC_DB_URL_PORT
+    KC_HEALTH_ENABLED
+    KC_METRICS_ENABLED
+  )
+  for i in "${!authserver_env[@]}"; do
+    authserver_env[i]="${authserver_env[i]}=${!authserver_env[i]}"
+  done
+  # init authserver as main process
+  env "${authserver_env[@]}" unbuffer "$START_DEV_AUTHSERVER" build | echo_label "AUTH"
+  # start authserver as background process
   authserver_log_file="$(mktemp)"
-  (unbuffer "$START_DEV_AUTHSERVER" | tee "$authserver_log_file" | echo_label "AUTH") & process_ids+=($!)
+  (env "${authserver_env[@]}" unbuffer "$START_DEV_AUTHSERVER" start-dev | tee "$authserver_log_file" | echo_label "AUTH") & process_ids+=($!)
   authserver_process_id="${process_ids[-1]}"
   # wait for the authserver to be ready to accept connections
   until \

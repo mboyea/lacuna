@@ -32,6 +32,29 @@ in {
         SELECT 'CREATE DATABASE lacuna'
         WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'lacuna')\gexec
 
+        -- CREATE DATABASE IF NOT EXISTS keycloak
+        SELECT 'CREATE DATABASE keycloak'
+        WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'keycloak')\gexec
+
+        -- USE keycloak
+        \c keycloak
+
+        -- CREATE USER IF NOT EXISTS $POSTGRES_AUTHSERVER_USERNAME WITH PASSWORD $POSTGRES_AUTHSERVER_PASSWORD
+        \getenv authserver_password POSTGRES_AUTHSERVER_PASSWORD
+        \getenv authserver_username POSTGRES_AUTHSERVER_USERNAME
+        \set do 'BEGIN\n  CREATE USER ' :authserver_username ' WITH PASSWORD ' :'authserver_password' ';  EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '''%, skipping''', SQLERRM USING ERRCODE = SQLSTATE;\nEND'
+        DO :'do';
+        \unset do
+
+        -- GRANT ALL PRIVILEGES ON DATABASE keycloak TO $POSTGRES_AUTHSERVER_USERNAME
+        GRANT ALL PRIVILEGES ON DATABASE keycloak TO :authserver_username;
+
+        -- ALTER DATABASE keycloak OWNER TO $POSTGRES_AUTHSERVER_USERNAME
+        ALTER DATABASE keycloak OWNER TO :authserver_username;
+
+        -- GRANT ALL ON SCHEMA public TO $POSTGRES_AUTHSERVER_USERNAME
+        GRANT ALL ON SCHEMA public TO :authserver_username;
+
         -- USE lacuna
         \c lacuna
 
