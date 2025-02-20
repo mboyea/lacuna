@@ -20,7 +20,7 @@
     cp -rv node_modules $out/lib
 
     cat > $out/bin/${pname} << EOF
-    #!${runtimeShell}
+    #!/${runtimeShell}
     ${pkgs.lib.getExe pkgs.nodejs} $out/lib/build
     EOF
 
