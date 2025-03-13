@@ -21,10 +21,11 @@ default_: report
 - [ ] (C) Write documentation in `docs/` @docs
 - [ ] (B) Draft `src/umami/` @code
 - [ ] (B) Draft deploy instructions in `README.md` @docs
-- [ ] (B) Draft script `nix run .#deploy` @code
 - [ ] (A) Draft content editor @code
 - [ ] (A) Draft `/admin/login` @code
-- [ ] (A) Draft keycloak configuration @code
+- [ ] (B) Draft script `nix run .#deploy` @code
+- [ ] (A) Complete `refactor/march-2025` @code @docs
+- [ ] ~~(A) Draft keycloak configuration @code~~
 - [x] (A) 2025-02-12 Draft keycloak server image @code
 - [x] (A) 2025-02-06 Draft sveltekit GET `/api/v1/content` @code
 - [x] (A) 2025-02-04 Draft script `nix run .#start prod` @code

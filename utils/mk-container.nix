@@ -1,52 +1,52 @@
-#--------------------------------
-# Author : Matthew Boyea
-# Origin : https://github.com/mboyea/lacuna
-# Description : use podman to start a docker image with Nix
-# Nix Usage : 
-#  server = pkgs.writeShellApplication {
-#    name = "${name}-server-${version}";
-#    runtimeInputs = [
-#      pkgs.uutils-coreutils-noprefix
-#    ];
-#    text = ''
-#      echo "Hello, world!"
-#      tail -f /dev/null
-#    '';
-#  };
-#  serverImage = let
-#    _name = "${name}-docker-image";
+#----------------------------------------
+# Description: Use podman to start a docker image
+# Usage:
+# let
+#   name = "test";
+#   version = "0.0.0";
+#   dockerImage = let
+#     _name = "${name}-docker-image";
 #     tag = version;
-#     baseImage = null;
-#  in {
-#    name = _name;
-#    inherit version tag;
-#    stream = pkgs.dockerTools.streamLayeredImage {
-#      name = _name;
-#      inherit tag;
-#      fromImage = baseImage;
-#      contents = [ server ];
-#      config = {
-#        Cmd = [ "${pkgs.lib.getExe server}" ];
-#        ExposedPorts = {
-#          "5555/tcp" = {};
-#        };
-#      };
-#    };
-#  };
-#  serverContainer = pkgs.callPackage ./mk-container.nix {
-#    inherit pkgs name version;
-#    image = serverImage;
-#    podmanArgs = [
-#      "--publish"
-#      "5555:5555"
-#    ];
-#  };
-#--------------------------------
+#     # update base image using variables from:
+#     #   xdg-open https://hub.docker.com/_/alpine/tags
+#     #   nix-shell -p nix-prefetch-docker
+#     #   nix-prefetch-docker --quiet --image-name alpine --image-tag _ --image-digest _
+#     baseImage = pkgs.dockerTools.pullImage {
+#       imageName = "alpine";
+#       imageDigest = "sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c";
+#       sha256 = "1nridd7sc65h48ir7ahv47d0hfi5bdixlsnlk5xviaz9nzxzz90m";
+#       finalImageName = "alpine";
+#       finalImageTag = "latest";
+#     };
+#   in {
+#     name = _name;
+#     inherit version tag;
+#     stream = pkgs.dockerTools.streamLayeredImage {
+#       name = _name;
+#       inherit tag;
+#       fromImage = baseImage;
+#       contents = [ pkgs.neofetch ];
+#       config = {
+#         Cmd = [ "${pkgs.lib.getExe pkgs.bash}" ];
+#       };
+#     };
+#   };
+# in pkgs.callPackage utils/mk-container.nix {
+#   imageName = dockerImage.name;
+#   imageTag = dockerImage.tag;
+#   imageStream = dockerImage.stream;
+#   podmanArgs = [
+#     "--network=host"
+#   ];
+# }
+# Origin: https://github.com/mboyea/www-mboyea-com
+# Author: Matthew Boyea
+#----------------------------------------
 {
   pkgs,
-  name,
-  version,
-  image,
+  imageName,
+  imageTag,
+  imageStream ? null,
   podmanArgs ? [],
   defaultImageArgs ? [],
   # ? https://forums.docker.com/t/solution-required-for-nginx-emerg-bind-to-0-0-0-0-443-failed-13-permission-denied/138875/2
@@ -62,17 +62,21 @@
   ensureStopOnExit ? false,
   # ! By default will pass --tty and --interactive to podman because that's the default use case for this utility
   useInteractiveTTY ? true,
+  runtimeInputs ? [],
+  runtimeEnv ? null,
   preStart ? "",
   postStop ? "",
 }: let
   _podmanArgs = podmanArgs
     ++ pkgs.lib.lists.optionals useInteractiveTTY [ "--tty" "--interactive" ]
     ++ pkgs.lib.lists.optionals ensureStopOnExit [ "--cidfile" "\"$container_id_file\"" ];
+  _runtimeInputs = runtimeInputs
+    ++ [ pkgs.podman ];
+  _runtimeEnv = runtimeEnv;
 in pkgs.writeShellApplication {
-  name = "${name}-${image.name}-mk-container-${version}";
-  runtimeInputs = [
-    pkgs.podman
-  ];
+  name = "${imageName}-container";
+  runtimeInputs = _runtimeInputs;
+  runtimeEnv = _runtimeEnv;
   text = ''
     # return true if user is root user
     isUserRoot() {
@@ -86,9 +90,6 @@ in pkgs.writeShellApplication {
         exit
       fi
     fi
-
-    # run pre start functions
-    ${preStart}
 
     # run post stop functions when this script exits
     container_id_file="$(mktemp)"
@@ -112,7 +113,12 @@ in pkgs.writeShellApplication {
     }
 
     # load the image into podman
-    echo_exec ${image.stream} | echo_exec podman image load
+    if "${pkgs.lib.trivial.boolToString (imageStream != null)}"; then
+      echo_exec ${imageStream} | echo_exec podman image load
+    fi
+
+    # run pre start functions
+    ${preStart}
 
     # declare the image arguments
     if [ "$#" -gt 0 ]; then
@@ -124,7 +130,7 @@ in pkgs.writeShellApplication {
     # run the image using podman
     echo_exec podman container run \
       ${pkgs.lib.strings.concatStringsSep " " _podmanArgs} \
-      localhost/${image.name}:${image.tag} \
+      localhost/${imageName}:${imageTag} \
       "''${image_args[@]}"
   '';
 }
