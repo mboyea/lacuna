@@ -25,6 +25,7 @@ default_: report
 - [ ] (B) Draft user manager @code
 - [ ] (A) Draft content editor @code
 - [ ] (A) Draft `/admin/login` @code
+- [ ] (A) Draft style showcase in `/` @code
 - [x] (A) 2025-03-14 Complete `refactor/march-2025` @code @docs
 - [ ] ~~(A) Draft keycloak configuration @code~~
 - [x] (A) 2025-02-12 Draft keycloak server image @code
