@@ -25,7 +25,7 @@ default_: report
 - [ ] (B) Draft user manager @code
 - [ ] (A) Draft content editor @code
 - [ ] (A) Draft `/admin/login` @code
-- [ ] (A) Complete `refactor/march-2025` @code @docs
+- [x] (A) 2025-03-14 Complete `refactor/march-2025` @code @docs
 - [ ] ~~(A) Draft keycloak configuration @code~~
 - [x] (A) 2025-02-12 Draft keycloak server image @code
 - [x] (A) 2025-02-06 Draft sveltekit GET `/api/v1/content` @code
