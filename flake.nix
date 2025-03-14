@@ -12,46 +12,84 @@
     system: let
       # import pkgs from inputs.nixpkgs
       pkgs = import nixpkgs { inherit system; };
-      # import submodules from src/
-      submodules = pkgs.lib.attrsets.mapAttrs
-        (n: v: import (./. + "/src/${n}") { inherit pkgs; })
-        (builtins.readDir ./src);
+      # import submodules from modules/
+      modules = pkgs.lib.attrsets.mapAttrs
+        (n: v: import (./. + "/modules/${n}") { inherit pkgs; })
+        (builtins.readDir ./modules);
     in rec {
       packages = {
-        help = pkgs.callPackage ./scripts/help.nix {
-          inherit name version;
+        help = pkgs.callPackage utils/run.nix {
+          name = "${name}-help-${version}";
+          target = scripts/help.sh;
         };
-        start = pkgs.callPackage ./scripts/start.nix {
-          inherit name version;
-          webServer = submodules.sveltekit.packages;
-          authServer = submodules.keycloak.packages;
-          database = submodules.postgres.packages;
-          envFiles = [ ".env.development" ];
+        start-dev = pkgs.callPackage utils/run.nix {
+          name = "${name}-start-dev-${version}";
+          target = scripts/start.sh;
+          runtimeInputs = [
+            pkgs.git
+            pkgs.expect
+          ];
+          runtimeEnv = {
+            START_DATABASE = pkgs.lib.getExe modules.postgres.packages.container;
+            # START_ANALYTICS = pkgs.lib.getExe modules.umami.packages.container;
+            START_WEBSERVER = pkgs.lib.getExe modules.sveltekit.packages.dev;
+            START_ENV_FILE = ".env.development";
+          };
         };
-        default = packages.start;
+        start-prod = packages.start-dev.override (base: {
+          name = "${name}-start-prod-${version}";
+          runtimeEnv = (base.runtimeEnv or {}) // {
+            START_DATABASE = pkgs.lib.getExe modules.postgres.packages.container;
+            # START_ANALYTICS = pkgs.lib.getExe modules.umami.packages.container;
+            START_WEBSERVER = pkgs.lib.getExe modules.sveltekit.packages.container;
+          };
+        });
+        deploy = pkgs.callPackage utils/run.nix {
+          name = "${name}-deploy-${version}";
+          runtimeInputs = [
+            pkgs.git
+            pkgs.flyctl
+            pkgs.gzip
+            pkgs.skopeo
+          ];
+          runtimeEnv = {
+            WEBSERVER_IMAGE_NAME = modules.sveltekit.packages.appImage.name;
+            WEBSERVER_IMAGE_TAG = modules.sveltekit.packages.appImage.tag;
+            WEBSERVER_IMAGE_STREAM = modules.sveltekit.packages.appImage.stream;
+            POSTGRES_SCHEMA_FILE = "modules/postgres/schema/init.sql";
+            DEPLOY_ENV_FILE = ".env";
+          };
+        };
+        default = packages.start-dev.override (base: {
+          cliArgs = (base.cliArgs or []) ++ [ "all" ];
+        });
       };
       apps = {
-        help = utils.lib.mkApp { drv = packages.help; };
-        start = utils.lib.mkApp { drv = packages.start; };
-        default = utils.lib.mkApp {
-          drv = packages.start.override { cliArgs = [ "dev" ]; };
-        };
+        start-dev = utils.lib.mkApp { drv = packages.start-dev; };
+        default = utils.lib.mkApp { drv = packages.default; };
       };
-      # the default devShell for each submodule is provided
+      # the default devShell for each module is provided
       devShells = (pkgs.lib.attrsets.mapAttrs
         (n: v: v.devShells.default)
-        submodules
+        modules
       ) // {
         # the root devshell provides packages used in scripts/
         root = pkgs.mkShell {
           packages = [
-            # kill program at PORT using: fuser -k PORT/tcp
-            pkgs.psmisc
-            # get sha256 for dockerTools.pullImage using:
-            # nix-prefetch-docker --quiet --image-name _ --image-tag _ --image-digest sha256:_
-            pkgs.nix-prefetch-docker
             # run docker containers without starting a daemon
             pkgs.podman
+            # install program unbuffer to preserve formatting when piping to tee
+            pkgs.expect
+            # kill program at <port> using: fuser -k <port>/tcp
+            pkgs.psmisc
+            # get information about the project like modified files and 
+            pkgs.git
+            # manage deployments on hosting provider Fly.io
+            pkgs.flyctl
+            # zip Docker images for deployment
+            pkgs.gzip
+            # deploy Docker images to a remote server
+            pkgs.skopeo
           ];
         };
         # the default devShell is a combination of every devShell
@@ -59,7 +97,7 @@
           inputsFrom = (
             pkgs.lib.attrsets.mapAttrsToList
             (n: v: devShells."${n}")
-            submodules
+            modules
           ) ++ [ devShells.root ];
         };
       };
