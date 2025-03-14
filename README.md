@@ -87,12 +87,16 @@ The contents of this file can never be revealed publicly, so be careful to only 
 
 - Create a file named `.env` in the root directory.
 - Add to `.env`:
+
   ```sh
-  FLY_APP_NAME="<unique_app_name>"
-  FLY_DB_NAME="<unique_app_name>"
+  FLY_APP_WEBSERVER="<unique_app_name>"
+  FLY_APP_ANALYTICS="<unique_app_name>"
+  FLY_APP_DATABASE="<unique_app_name>"
   POSTGRES_PASSWORD="<unique_password>"
   POSTGRES_WEBSERVER_PASSWORD="<unique_password>"
+  POSTGRES_ANALYTICS_PASSWORD="<unique_password>"
   ```
+
 - Run `nix run .#deploy all`
 
 The application will perform its first deployment.

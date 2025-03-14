@@ -19,11 +19,11 @@
     in rec {
       packages = {
         help = pkgs.callPackage utils/run.nix {
-          name = "${name}-${version}-help";
+          name = "${name}-help-${version}";
           target = scripts/help.sh;
         };
         start-dev = pkgs.callPackage utils/run.nix {
-          name = "${name}-${version}-start-dev";
+          name = "${name}-start-dev-${version}";
           target = scripts/start.sh;
           runtimeInputs = [
             pkgs.git
@@ -31,21 +31,21 @@
           ];
           runtimeEnv = {
             START_DATABASE = pkgs.lib.getExe modules.postgres.packages.container;
-            START_ANALYTICS = pkgs.lib.getExe modules.umami.packages.container;
+            # START_ANALYTICS = pkgs.lib.getExe modules.umami.packages.container;
             START_WEBSERVER = pkgs.lib.getExe modules.sveltekit.packages.dev;
             START_ENV_FILE = ".env.development";
           };
         };
         start-prod = packages.start-dev.override (base: {
-          name = "${name}-${version}-start-prod";
-          runtimeEnv = base.runtimeEnv // {
+          name = "${name}-start-prod-${version}";
+          runtimeEnv = (base.runtimeEnv or {}) // {
             START_DATABASE = pkgs.lib.getExe modules.postgres.packages.container;
-            START_ANALYTICS = pkgs.lib.getExe modules.umami.packages.container;
+            # START_ANALYTICS = pkgs.lib.getExe modules.umami.packages.container;
             START_WEBSERVER = pkgs.lib.getExe modules.sveltekit.packages.container;
           };
         });
         deploy = pkgs.callPackage utils/run.nix {
-          name = "${name}-${version}-deploy";
+          name = "${name}-deploy-${version}";
           runtimeInputs = [
             pkgs.git
             pkgs.flyctl
@@ -53,15 +53,15 @@
             pkgs.skopeo
           ];
           runtimeEnv = {
-            WEBSERVER_IMAGE_NAME = modules.sveltekit.packages.dockerImage.name;
-            WEBSERVER_IMAGE_TAG = modules.sveltekit.packages.dockerImage.tag;
-            WEBSERVER_IMAGE_STREAM = modules.sveltekit.packages.dockerImage.stream;
-            POSTGRES_SCHEMA_DIR = "modules/postgres/schema";
+            WEBSERVER_IMAGE_NAME = modules.sveltekit.packages.appImage.name;
+            WEBSERVER_IMAGE_TAG = modules.sveltekit.packages.appImage.tag;
+            WEBSERVER_IMAGE_STREAM = modules.sveltekit.packages.appImage.stream;
+            POSTGRES_SCHEMA_FILE = "modules/postgres/schema/init.sql";
             DEPLOY_ENV_FILE = ".env";
-          }
+          };
         };
         default = packages.start-dev.override (base: {
-          cliArgs = base.cliArgs ++ [ "all" ];
+          cliArgs = (base.cliArgs or []) ++ [ "all" ];
         });
       };
       apps = {

@@ -96,8 +96,8 @@ kill_processes() {
 # script to start the database
 script_start_database() {
   test_commands unbuffer
-  test_env_variables POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD POSTGRES_ANALYTICS_USERNAME POSTGRES_ANALYTICS_PASSWORD
-  echo "DATABASE STARTING"
+  test_env_variables START_DATABASE POSTGRES_PASSWORD POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD POSTGRES_ANALYTICS_USERNAME POSTGRES_ANALYTICS_PASSWORD
+  echo "Starting database."
   # start database as background process
   database_log_file="$(mktemp)"
   (unbuffer "$START_DATABASE" | tee "$database_log_file") & process_ids+=($!)
@@ -112,30 +112,44 @@ script_start_database() {
     fi
     sleep 0.1
   done
-  echo "DATABASE STARTED"
 }
 
 # script to start the analytics server
 script_start_analytics() {
   test_commands unbuffer
-  test_env_variables
-  echo "ANALYTICS SERVER STARTING"
   # TODO
-  echo "ANALYTICS SERVER STARTED"
+  test_env_variables
+  echo "Starting analytics server."
+  # start analytics server as background process
+  analytics_log_file="$(mktemp)"
+  (unbuffer "$START_ANALYTICS" | tee "$analytics_log_file") & process_ids+=($!)
+  local analytics_process_id="${process_ids[-1]}"
+  # wait for analytics server to be ready to accept connections
+  until \
+    # TODO
+    grep -q "^" "$analytics_log_file"
+  do
+    if ! ps -p "$analytics_process_id" > /dev/null; then
+      echo_error "The database failed to start"
+      exit 1
+    fi
+    sleep 0.1
+  done
 }
 
 # script to start the webserver
 script_start_webserver() {
   test_commands unbuffer
-  test_env_variables POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD POSTGRES_NETLOC POSTGRES_PORT
-  echo "WEBSERVER STARTING"
+  test_env_variables START_WEBSERVER POSTGRES_WEBSERVER_USERNAME POSTGRES_WEBSERVER_PASSWORD POSTGRES_NETLOC POSTGRES_PORT
+  echo "Starting webserver."
   # start webserver as background process
   webserver_log_file="$(mktemp)"
   (unbuffer "$START_WEBSERVER" | tee "$webserver_log_file") & process_ids+=($!)
   local webserver_process_id="${process_ids[-1]}"
   # wait for webserver to be ready to accept connections
   until \
-    grep -q "^.*VITE.*ready" "$webserver_log_file"
+    grep -q "^.*VITE.*ready" "$webserver_log_file" \
+    || grep -q "^.*Listening on" "$webserver_log_file"
   do
     if ! ps -p "$webserver_process_id" > /dev/null; then
       echo_error "The database failed to start"
@@ -143,16 +157,18 @@ script_start_webserver() {
     fi
     sleep 0.1
   done
-  echo "WEBSERVER STARTED"
 }
 
+is_script_set=false
 do_start_database=false
 do_start_analytics=false
 do_start_webserver=false
+script_args=()
 # determine the functions to run from arguments
 interpret_args() {
   # if no arguments passed, start all servers
   if [[ $# -eq 0 ]]; then
+    is_script_set=true
     do_start_database=true
     do_start_analytics=true
     do_start_webserver=true
@@ -162,21 +178,32 @@ interpret_args() {
   while [[ $# -gt 0 ]]; do
     case $1 in
       all)
+        is_script_set=true
         do_start_database=true
         do_start_analytics=true
         do_start_webserver=true
       ;;
       database|postgres)
+        is_script_set=true
         do_start_database=true
       ;;
       analytics|umami)
+        is_script_set=true
         do_start_analytics=true
       ;;
       webserver|sveltekit)
+        is_script_set=true
         do_start_webserver=true
+      ;;
       *)
-        echo_error "The argument \"$1\" is not a recognized target"
-        exit 1
+        # if no script set, print error
+        if ! "$is_script_set"; then
+          echo_error "The argument \"$1\" is not a recognized target"
+          exit 1
+        fi
+        # otherwise remaining arguments must be for the script
+        script_args+=("$@")
+        return
       ;;
     esac
     shift
@@ -196,14 +223,16 @@ main() {
   set +a
   interpret_args "$@"
   trap kill_processes EXIT
-  if "$do_start_database"; then;
-    script_start_database
+  # start apps
+  if "$do_start_database"; then
+    script_start_database "${script_args[@]}"
   fi
-  if "$do_start_analytics"; then;
-    script_start_analytics
+  if "$do_start_analytics"; then
+    # TODO script_start_analytics "${script_args[@]}"
+    :
   fi
-  if "$do_start_webserver"; then;
-    script_start_webserver
+  if "$do_start_webserver"; then
+    script_start_webserver "${script_args[@]}"
   fi
   # wait for any background job to terminate
   wait -n
