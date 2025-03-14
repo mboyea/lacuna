@@ -11,7 +11,7 @@ in pkgs.buildNpmPackage {
   src = ../.;
   # Generate a new dependency hash using:
   #   prefetch-npm-deps path/to/package-lock.json
-  npmDepsHash = "sha256-ILtzGkiTOcNMYX5Ox05VujnU0sXiAzX+SeJ27ofS4jI=";
+  npmDepsHash = "sha256-3A3HlkzcIiIg9401qQudc8Sp0VH+iKRIWenxN4i0pqw=";
   npmBuildScript = "build";
   installPhase = ''
     mkdir -p "$out/bin" "$out/lib"
