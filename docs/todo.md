@@ -14,16 +14,17 @@ default_: report
 
 ## Milestones
 
-- [ ] (C) Fork to www-lacuna-com
 - [ ] (A) Announce release for +1.0.0 @docs
 - [ ] (D) credit https://github.com/michael/editable-website for svelte tech
+- [ ] (C) Draft documentation in `docs/` @docs
 - [ ] (C) Draft Github Actions to deploy `docs/` to GitHub pages @code @docs
-- [ ] (C) Write documentation in `docs/` @docs
-- [ ] (B) Draft `src/umami/` @code
 - [ ] (B) Draft deploy instructions in `README.md` @docs
+- [ ] (B) Draft script `nix run .#deploy` @code
+- [ ] (B) Draft web analytics @code
+- [ ] (B) Draft `src/umami/` @code
+- [ ] (B) Draft user manager @code
 - [ ] (A) Draft content editor @code
 - [ ] (A) Draft `/admin/login` @code
-- [ ] (B) Draft script `nix run .#deploy` @code
 - [ ] (A) Complete `refactor/march-2025` @code @docs
 - [ ] ~~(A) Draft keycloak configuration @code~~
 - [x] (A) 2025-02-12 Draft keycloak server image @code
