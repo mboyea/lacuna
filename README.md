@@ -244,10 +244,8 @@ There is no way to fund the project at this time, but if enough interested is ge
 Feel free to fork, just be sure to [read the license](./LICENSE.md).
 
 [Nix (the package manager)]: https://nixos.org/
-[Docker]: https://docs.docker.com/get-started/overview/
 [SvelteKit]: https://kit.svelte.dev/docs/introduction
 [Node.js]: https://nodejs.org/en/docs/guides/getting-started-guide
-[Angular]: https://angularjs.org/
 [Sass]: https://sass-lang.com/guide
 [Typescript]: https://www.typescriptlang.org/why-create-typescript
 [Postgres]: https://www.postgresql.org/
