@@ -1,37 +1,36 @@
 <script lang="ts">
+  import ThemeDropdown from '$lib/modules/ThemeDropdown.svelte';
   import './+layout.scss'
 </script>
 
 <header id="page-header">
   <hgroup>
-    <h1>Pico CSS</h1>
-    <p>A minimal HTML example.</p>
+    <h1>Lacuna</h1>
+    <p>A SvelteKit template with sane defaults and CMS features.</p>
   </hgroup>
-  <nav>
-    <ul>
-      <li>
-        <details class="dropdown">
-          <summary role="button" class="secondary">Theme</summary>
-          <ul>
-            <li><a href="#" data-theme-switcher="auto">Auto</a></li>
-            <li><a href="#" data-theme-switcher="light">Light</a></li>
-            <li><a href="#" data-theme-switcher="dark">Dark</a></li>
-          </ul>
-        </details>
-      </li>
-    </ul>
-  </nav>
+  <ThemeDropdown />
 </header>
 <main tabindex="-1" id="page-main">
   <slot />
 </main>
 <footer id="page-footer">
-  <small
-    >Built with <a href="https://picocss.com">Pico</a> •
-    <a href="https://github.com/picocss/examples/blob/master/v2-html/index.html"
-      >Source code</a
-    ></small
-  >
+    <small>
+      Built with
+      <a href="https://github.com/mboyea/lacuna">Lacuna CMS</a>
+    </small>
+  <p>
+    <small>
+      <a href="https://nixos.org/">Nix</a>
+      •
+      <a href="https://nixos.org/">Postgres</a>
+      •
+      <a href="https://svelte.dev/">SvelteKit</a>
+      •
+      <a href="https://picocss.com">Pico Css</a>
+      •
+      <a href="https://fly.io/">Fly.io</a>
+    </small>
+  </p>
 </footer>
 
 <style lang="scss">
@@ -58,6 +57,7 @@
   footer {
     flex: 0 0;
     z-index: 1;
+    text-align: center;
   }
 </style>
 
