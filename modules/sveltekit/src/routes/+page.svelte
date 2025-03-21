@@ -1,6 +1,6 @@
 <script lang="ts">
-  // https://github.com/picocss/examples/tree/master/v2-html
-  // https://picocss.com/docs
+  // * https://github.com/picocss/examples/tree/master/v2-html
+  // * https://picocss.com/docs
   const toggleModal = () => {}
 </script>
 

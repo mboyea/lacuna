@@ -2,10 +2,10 @@
   import './+layout.scss'
 </script>
 
-<header id="page-header" class="container">
+<header id="page-header">
   <hgroup>
-    <h1>Pico</h1>
-    <p>A pure HTML example, without dependencies.</p>
+    <h1>Pico CSS</h1>
+    <p>A minimal HTML example.</p>
   </hgroup>
   <nav>
     <ul>
@@ -22,10 +22,10 @@
     </ul>
   </nav>
 </header>
-<main tabindex="-1" id="page-main" class="container">
+<main tabindex="-1" id="page-main">
   <slot />
 </main>
-<footer id="page-footer" class="container">
+<footer id="page-footer">
   <small
     >Built with <a href="https://picocss.com">Pico</a> •
     <a href="https://github.com/picocss/examples/blob/master/v2-html/index.html"
